@@ -1,32 +1,26 @@
 package frc.robot.swerve;
 
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.PersistMode;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkMax;
-
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Voltage;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 
 public class Module {
     public final TalonFX drive;
-    public final SparkMax steer;
+    public final TalonFX steer;
     public final Swerve.Encoder encoder;
 
     double desiredAngle;
@@ -36,49 +30,50 @@ public class Module {
 
     public Module(ShuffleboardLayout tab, int driveID, int steerID, int encoderID, boolean heliumEncoder) {
         drive = new TalonFX(driveID, "rio");
-        steer = new SparkMax(steerID, MotorType.kBrushless);
+        steer = new TalonFX(steerID, "rio");
         encoder = (heliumEncoder) ? new Swerve.Canand(encoderID) : new Swerve.Cancoder(encoderID);
 
-        SparkMaxConfig steerConfig = new SparkMaxConfig();
+        TalonFXConfiguration steerConfig = new TalonFXConfiguration();
 
-        steerConfig
-                .smartCurrentLimit(20)
-                .idleMode(IdleMode.kBrake)
-                .inverted(true);
-
-        steerConfig.encoder
-                .positionConversionFactor(Math.PI * STEER_REDUCTION)
-                .velocityConversionFactor(Math.PI * STEER_REDUCTION / 60);
-
-        steerConfig.closedLoop
-                .positionWrappingEnabled(true)
-                .positionWrappingMaxInput(Swerve.PI2)
-                // .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .pid(0.2, 0.0, 0.0);
-
-                steerConfig.signals.primaryEncoderPositionAlwaysOn(false);
-                steerConfig.signals.primaryEncoderPositionPeriodMs(10); // Test how changing period affects swerve
-
-        TalonFXConfiguration config = new TalonFXConfiguration();
-
-        config.CurrentLimits.StatorCurrentLimit = 80;
-        config.CurrentLimits.StatorCurrentLimitEnable = true;
-
-        config.CurrentLimits.SupplyCurrentLimit = 20;
-        config.CurrentLimits.SupplyCurrentLimitEnable = true;
+        steerConfig.CurrentLimits.StatorCurrentLimit = 80;
+        steerConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        steerConfig.CurrentLimits.SupplyCurrentLimit = 20;
+        steerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         
-        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        steerConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        steerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        steer.configure(steerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        // TODO Tune PID Values
+        steerConfig.Slot0.kP = 0.2;
+        steerConfig.Slot0.kI = 0.0;
+        steerConfig.Slot0.kD = 0.0;
+        steerConfig.ClosedLoopGeneral.ContinuousWrap = true;
 
-        steer.getEncoder().setPosition(angle());
+        // replaces our conversion factors
+        steerConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+        steerConfig.Feedback.RotorToSensorRatio = STEER_REDUCTION;
+        
+        steer.getConfigurator().apply(steerConfig);
+        // set position in phoenix returns mechanism rotations so converts encoder angle to rotations.
+        steer.setPosition(angle() / Swerve.PI2);
 
-        drive.getConfigurator().apply(config);
+        TalonFXConfiguration driveConfig = new TalonFXConfiguration();
+
+        driveConfig.CurrentLimits.StatorCurrentLimit = 80;
+        driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+
+        driveConfig.CurrentLimits.SupplyCurrentLimit = 20;
+        driveConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        
+        driveConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+
+        driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+        drive.getConfigurator().apply(driveConfig);
 
         tab.addDouble("Absolute Angle", () -> Math.toDegrees(angle()));
-        tab.addDouble("Current Angle", () -> Math.toDegrees(steer.getEncoder().getPosition()));
-        tab.addDouble("Angle Difference", () -> Math.toDegrees(angle() - steer.getEncoder().getPosition()));
+        tab.addDouble("Current Angle", () -> steer.getPosition().getValueAsDouble() * Swerve.PI2);
+        tab.addDouble("Angle Difference", () -> Math.toDegrees(angle() - (steer.getPosition().getValueAsDouble() * Swerve.PI2)));
         tab.addDouble("Target Angle", () -> Math.toDegrees(desiredAngle));
         tab.addBoolean("Active", encoder::connected);
     }
@@ -88,7 +83,7 @@ public class Module {
     }
 
     public void syncEncoders() {
-        steer.getEncoder().setPosition(encoder.angle());
+        steer.setPosition(encoder.angle() / Swerve.PI2);
     }
 
     public void zeroAbsolute() {
@@ -116,7 +111,7 @@ public class Module {
     }
 
     public Voltage steerVoltage(){
-        return Volts.of(steer.getBusVoltage());
+        return steer.getSupplyVoltage().getValue();
     }
 
     public void stop() {
@@ -125,10 +120,10 @@ public class Module {
     }
 
     public void set(double driveVolts, double targetAngle) {
+        double normalized = MathUtil.inputModulus(targetAngle, 0, Swerve.PI2);
         syncEncoders();
-
         drive.set(driveVolts);
-        steer.getClosedLoopController().setSetpoint(targetAngle, ControlType.kPosition);
+        steer.setControl(new PositionVoltage(0).withPosition(normalized / Swerve.PI2));
     }
 
     public void setSteer(double steerVolts){
