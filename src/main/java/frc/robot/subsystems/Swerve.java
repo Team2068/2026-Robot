@@ -63,6 +63,12 @@ public class Swerve extends SubsystemBase {
 
     public boolean active = true;
 
+    public static enum swerveState {
+        DEFAULT, SCORING, PASSING
+    }
+
+    public static swerveState currentState = swerveState.DEFAULT;
+
     public Swerve() {
         kinematics = new SwerveDriveKinematics(
                 createTranslation(constants.TRACKWIDTH / 2.0, constants.WHEELBASE / 2.0),
@@ -183,8 +189,6 @@ public class Swerve extends SubsystemBase {
         SwerveDriveKinematics.desaturateWheelSpeeds(states, Constants.MAX_VELOCITY);
         for (int i = 0; i < modules.length; i++) {
             states[i].optimize(new Rotation2d(modules[i].angle()));
-            // states[i].cosineScale(new Rotation2d(modules[i].angle())); // TODO Test how
-            // Cosine compensation affects Swerve
             modules[i].set((states[i].speedMetersPerSecond / Constants.MAX_VELOCITY) * .8,
                     states[i].angle.getRadians());
         }

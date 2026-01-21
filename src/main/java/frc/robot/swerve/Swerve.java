@@ -22,8 +22,8 @@ public class Swerve {
         // BOT SWITCHING
         public boolean heliumEncoders = true;
 
-        public double TRACKWIDTH = 30; // 30.0 for MKi
-        public double WHEELBASE = 30; // 30.0 for MKi
+        public double TRACKWIDTH = 27; // 30.0 for MKi
+        public double WHEELBASE = 27; // 30.0 for MKi
         public double GEAR_RATIO = 8.14;
         public double WHEEL_RADIUS = .1143;
 
