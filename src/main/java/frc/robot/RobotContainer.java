@@ -23,6 +23,12 @@ public class RobotContainer {
   Command current_auto = new PrintCommand("");
   final SendableChooser<Integer> driver_selector = new SendableChooser<Integer>();
 
+  public static enum robotState {
+    DEFAULT, SCORING, PASSING
+  }
+
+  public static robotState currentState = robotState.DEFAULT;
+
   public RobotContainer() {
     main = new AutomatedController(0, io);
 
