@@ -84,8 +84,8 @@ public class Swerve extends SubsystemBase {
                     tab.getLayout(Constants.LAYOUT_TITLE[i], BuiltInLayouts.kList)
                             .withSize(2, 4)
                             .withPosition(i * 2, 0),
-                    Constants.CHASSIS_ID[i],
-                    Constants.CHASSIS_ID[i],
+                    Constants.DRIVE_ID[i],
+                    Constants.STEER_ID[i],
                     Constants.ENCODER_ID[i],
                     constants.heliumEncoders);
         }
