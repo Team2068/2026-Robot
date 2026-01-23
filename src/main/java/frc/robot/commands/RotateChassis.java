@@ -7,7 +7,7 @@ import frc.robot.utility.IO;
 
 public class RotateChassis extends Command {
   IO io;
-  PIDController pid = new PIDController(0, 0, 0);
+  PIDController pid = new PIDController(0.01, 0, 0.001);
   double target;
 
   public RotateChassis(IO io, double target) {
@@ -18,8 +18,8 @@ public class RotateChassis extends Command {
 
   @Override
   public void initialize() {
-    pid.setTolerance(0.05);
-    pid.enableContinuousInput(0, 360);
+    pid.setTolerance(Math.toRadians(1));
+    pid.enableContinuousInput(-Math.PI, Math.PI);
   }
 
   @Override
