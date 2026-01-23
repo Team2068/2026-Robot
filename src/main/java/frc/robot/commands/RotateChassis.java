@@ -24,7 +24,7 @@ public class RotateChassis extends Command {
 
   @Override
   public void execute() {
-    io.chassis.drive(new ChassisSpeeds(0, 0, pid.calculate(io.chassis.getYaw(), target)));
+    io.chassis.drive(new ChassisSpeeds(0, 0, pid.calculate(Math.toRadians(io.chassis.getYaw()), target)));
   }
 
   @Override

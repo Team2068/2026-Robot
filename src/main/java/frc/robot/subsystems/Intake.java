@@ -27,7 +27,7 @@ public class Intake extends SubsystemBase {
     intake.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
-  public void set(double speed){
+  public void speed(double speed){
     intake.set(speed);
     active = speed != 0.0;
   }
@@ -44,7 +44,7 @@ public class Intake extends SubsystemBase {
 
   public void intake(){
     if(active)
-      set(intakeSpeed);
+      speed(intakeSpeed);
     else
       stop();
   }

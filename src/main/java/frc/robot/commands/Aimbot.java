@@ -32,7 +32,7 @@ public class Aimbot extends Command {
     pid.enableContinuousInput(-Math.PI, Math.PI);
     pid.reset();
   }
-
+  
   @Override
   public void execute() {
     // TODO Get all values
@@ -48,7 +48,7 @@ public class Aimbot extends Command {
       io.chassis.targetRotation = 0.0;
     }
     else{
-      io.chassis.targetRotation = pid.calculate(io.chassis.getYaw(), target); // TODO might need to use MathUtil.clamp to make it less jittery
+      io.chassis.targetRotation = pid.calculate(Math.toRadians(io.chassis.getYaw()), target); // TODO might need to use MathUtil.clamp to make it less jittery
     }
   }
 
