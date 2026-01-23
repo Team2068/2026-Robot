@@ -67,7 +67,9 @@ public class Swerve extends SubsystemBase {
         DEFAULT, SCORING, PASSING
     }
 
-    public static swerveState currentState = swerveState.DEFAULT;
+    public Double targetRotation = null;
+
+    public swerveState currentState = swerveState.DEFAULT;
 
     public Swerve() {
         kinematics = new SwerveDriveKinematics(
