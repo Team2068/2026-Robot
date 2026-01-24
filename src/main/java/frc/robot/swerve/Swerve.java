@@ -7,6 +7,7 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.reduxrobotics.sensors.canandmag.Canandmag;
 import com.reduxrobotics.sensors.canandmag.CanandmagSettings;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.AngularVelocity;
 
 import static edu.wpi.first.units.Units.Radians;
@@ -48,6 +49,9 @@ public class Swerve {
         public static final int[] ENCODER_ID = { 11, 12, 13, 14 }; // FL, FR, BL, BR
         public static double[] ENCODER_OFFSETS = {-0.87890625, -0.996337890625, -0.638427734375, -0.892822265625};
         public static final int PIGEON_ID = 6;
+
+
+       
 
         public Constants(){
             try {

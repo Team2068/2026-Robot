@@ -10,4 +10,6 @@ public class DistanceShootUtil {
         this.hoodAngle = hoodAngle;
         this.shooterRPM = shooterRPM;
     }
+
+    
 }
