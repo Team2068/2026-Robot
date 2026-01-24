@@ -44,7 +44,7 @@ public class Module {
         steerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         // TODO Tune PID Values
-        steerConfig.Slot0.kP = 0.2;
+        steerConfig.Slot0.kP = 10;
         steerConfig.Slot0.kI = 0.0;
         steerConfig.Slot0.kD = 0.0;
         steerConfig.ClosedLoopGeneral.ContinuousWrap = true;
@@ -120,7 +120,7 @@ public class Module {
 
     public void set(double driveVolts, double targetAngle) {
         double normalized = MathUtil.inputModulus(targetAngle, 0, Swerve.PI2);
-        syncEncoders();
+        // syncEncoders();
         drive.set(driveVolts);
         steer.setControl(positionRequest.withPosition(normalized / Swerve.PI2));
     }
