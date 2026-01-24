@@ -17,8 +17,9 @@ public class Aimbot extends Command {
 
   // Hub cords, will likely move to a constants folder since these values will be
   // needed for the distance shoot
-  private static final Translation2d BLUE_HUB = new Translation2d(0, 0); // TODO get positions
-  private static final Translation2d RED_HUB = new Translation2d(0, 0);
+  private static final Translation2d BLUE_HUB = new Translation2d(-3.6475, 0); // TODO get positions
+  private static final Translation2d RED_HUB = new Translation2d(3.6423, 0);
+//Estimated directly from Limelight Andymark Map (in meters)
 
   public Aimbot(IO io, swerveState state) {
     this.io = io;

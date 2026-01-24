@@ -15,9 +15,9 @@ public class DistanceShoot extends Command {
 
 
 
-  private static final Translation2d BLUE_HUB = new Translation2d(0, 0); // TODO get positions
-         private static final Translation2d RED_HUB = new Translation2d(0, 0);
-
+  private static final Translation2d BLUE_HUB = new Translation2d(-3.6475, 0); // TODO get positions 
+         private static final Translation2d RED_HUB = new Translation2d(3.6423, 0);
+//Estimated directly from Limelight Andymark Map (in meters)
   /*
   math in meters instead of feet
   x: distance parallel to floor from shooter to ball
@@ -66,14 +66,15 @@ Angle of Rim to Hole opposite (side to side): .442 rad, 25.3 deg
 
 
 
-  DistanceShootUtil[] data = {new DistanceShootUtil(0, 0, 0)};
+  DistanceShootUtil[] data;
 
  double distance;
 
 int point= (int) Math.floor(distance);
 
-double angle = (data[point-4].hoodAngle + data[point-3].hoodAngle)*0.5;
-double RPM = (data[point-4].shooterRPM + data[point-3].shooterRPM)*0.5;
+
+double angle = (data[point-4].hoodAngle + data[point-3].hoodAngle)*0.5; // Min. Shooting distance: 4 feet
+double RPM = (data[point-4].shooterRPM + data[point-3].shooterRPM)*0.5; //TODO readjust for min. distance for passing
 
 
 
@@ -83,6 +84,19 @@ double RPM = (data[point-4].shooterRPM + data[point-3].shooterRPM)*0.5;
 
 
   public DistanceShoot(IO io) {
+    this.io = io;
+    
+    switch (io.chassis.currentState) {
+      case SCORING:
+        data = new DistanceShootUtil[] {new DistanceShootUtil(0,0,0)};
+        break;
+      case PASSING:
+        data = new DistanceShootUtil[] {new DistanceShootUtil(0,0,0)};
+        break;
+      default:
+        break;
+    }
+
     addRequirements(io.flywheel);
   }
 
@@ -101,7 +115,7 @@ double RPM = (data[point-4].shooterRPM + data[point-3].shooterRPM)*0.5;
     } else if (state == swerveState.SCORING) {
       Translation2d hub = blue ? BLUE_HUB : RED_HUB;
       Translation2d diff = hub.minus(io.chassis.pose().getTranslation());
-      distance = Math.hypot(diff.getY(), diff.getX());
+      distance = Math.hypot(diff.getY(), diff.getX()) *3.281; //Converted from meters to feet
 
     // Check if flywheel has hit RPM
       if(io.flywheel.RPM()==RPM){
