@@ -95,21 +95,21 @@ public class Swerve extends SubsystemBase {
 
         estimator = new SwerveDrivePoseEstimator(kinematics, rotation(), modulePositions(), odometry.getPoseMeters());
 
-        AutoBuilder.configure(
-                this::pose,
-                this::resetOdometry,
-                this::getSpeeds,
-                (speeds, feedforwards) -> drive(speeds),
-                new PPHolonomicDriveController(
-                        new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-                        new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-                ),
-                constants.autoConfig, // The robot configuration
-                () -> {
-                    var alliance = DriverStation.getAlliance();
-                    return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
-                },
-                this);
+        // AutoBuilder.configure(
+        //         this::pose,
+        //         this::resetOdometry,
+        //         this::getSpeeds,
+        //         (speeds, feedforwards) -> drive(speeds),
+        //         new PPHolonomicDriveController(
+        //                 new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+        //                 new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+        //         ),
+        //         constants.autoConfig, // The robot configuration
+        //         () -> {
+        //             var alliance = DriverStation.getAlliance();
+        //             return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
+        //         },
+        //         this);
     }
 
     private Translation2d createTranslation(double x, double y) {

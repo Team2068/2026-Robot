@@ -47,7 +47,6 @@ public class Flywheel extends SubsystemBase {
 
   public void RPM(double rpm){
     rpm = MathUtil.clamp(rpm, 0.0, 6000.0);
-
     flywheel.setControl(control.withVelocity(rpm / 60.0));
   }
 

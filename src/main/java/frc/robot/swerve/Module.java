@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -24,13 +23,14 @@ public class Module {
     public final Swerve.Encoder encoder;
 
     double desiredAngle;
+    PositionVoltage positionRequest = new PositionVoltage(0);
 
     public static final double WHEEL_DIAMETER = Units.inchesToMeters(4);
-    public static final double STEER_REDUCTION = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
+    public static final double STEER_REDUCTION = 26;
 
     public Module(ShuffleboardLayout tab, int driveID, int steerID, int encoderID, boolean heliumEncoder) {
-        drive = new TalonFX(driveID, "rio");
-        steer = new TalonFX(steerID, "rio");
+        drive = new TalonFX(driveID, "Swerve");
+        steer = new TalonFX(steerID, "Swerve");
         encoder = (heliumEncoder) ? new Swerve.Canand(encoderID) : new Swerve.Cancoder(encoderID);
 
         TalonFXConfiguration steerConfig = new TalonFXConfiguration();
@@ -50,8 +50,7 @@ public class Module {
         steerConfig.ClosedLoopGeneral.ContinuousWrap = true;
 
         // replaces our conversion factors
-        steerConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
-        steerConfig.Feedback.RotorToSensorRatio = STEER_REDUCTION;
+        steerConfig.Feedback.SensorToMechanismRatio = STEER_REDUCTION;
         
         steer.getConfigurator().apply(steerConfig);
         // set position in phoenix returns mechanism rotations so converts encoder angle to rotations.
@@ -123,7 +122,7 @@ public class Module {
         double normalized = MathUtil.inputModulus(targetAngle, 0, Swerve.PI2);
         syncEncoders();
         drive.set(driveVolts);
-        steer.setControl(new PositionVoltage(0).withPosition(normalized / Swerve.PI2));
+        steer.setControl(positionRequest.withPosition(normalized / Swerve.PI2));
     }
 
     public void setSteer(double steerVolts){
