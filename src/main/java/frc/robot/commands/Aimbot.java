@@ -11,7 +11,7 @@ import frc.robot.utility.IO;
 public class Aimbot extends Command {
   IO io;
   swerveState state;
-  PIDController pid = new PIDController(0.01, 0, 0.001);
+  PIDController pid = new PIDController(0.1, 0, 0.001); // TODO tune this
   boolean blue;
   double target;
 
@@ -22,6 +22,7 @@ public class Aimbot extends Command {
 
   public Aimbot(IO io, swerveState state) {
     this.io = io;
+    this.state = state;
     blue = DriverStation.getAlliance().get() == Alliance.Blue;
   }
 

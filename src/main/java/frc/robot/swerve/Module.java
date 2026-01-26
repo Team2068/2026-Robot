@@ -120,7 +120,7 @@ public class Module {
 
     public void set(double driveVolts, double targetAngle) {
         double normalized = MathUtil.inputModulus(targetAngle, 0, Swerve.PI2);
-        // syncEncoders();
+        syncEncoders();
         drive.set(driveVolts);
         steer.setControl(positionRequest.withPosition(normalized / Swerve.PI2));
     }

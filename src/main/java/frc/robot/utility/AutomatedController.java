@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.commands.Aimbot;
+import frc.robot.subsystems.Swerve.swerveState;
 
 public class AutomatedController {
     public final CommandXboxController controller;
@@ -77,6 +79,8 @@ public class AutomatedController {
         controller.povDown().and( manual() ).onTrue(Util.Do(io.chassis::toggle));
         controller.povLeft().and( manual() ).onTrue(Util.Do(io.chassis::syncEncoders));
         controller.povRight().and( manual() ).and(() -> {return !io.chassis.active;}).onTrue(new InstantCommand(io.chassis::zeroAbsolute));
+
+        controller.a().and( manual()).onTrue(new Aimbot(io, swerveState.SCORING));
     }
 
     void configureCharacterisaton(){
