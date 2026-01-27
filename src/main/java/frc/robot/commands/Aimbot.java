@@ -11,7 +11,7 @@ import frc.robot.utility.IO;
 public class Aimbot extends Command {
   IO io;
   swerveState state;
-  PIDController pid = new PIDController(0.1, 0, 0.001); // TODO tune this
+  PIDController pid = new PIDController(0.01, 0, 0.001); // TODO tune this
   boolean blue;
   double target;
 
@@ -29,7 +29,7 @@ public class Aimbot extends Command {
   @Override
   public void initialize() {
     io.chassis.currentState = state;
-    pid.setTolerance(Math.toRadians(1));
+    pid.setTolerance(Math.toRadians(5));
     pid.enableContinuousInput(-Math.PI, Math.PI);
     pid.reset();
   }
