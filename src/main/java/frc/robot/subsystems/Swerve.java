@@ -6,9 +6,6 @@ import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.Radians;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -25,7 +22,6 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutAngle;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -43,7 +39,7 @@ public class Swerve extends SubsystemBase {
     public boolean field_oritented = true;
     private final SwerveDriveKinematics kinematics;
 
-    public final Pigeon2 pigeon2 = new Pigeon2(Constants.PIGEON_ID);
+    public final Pigeon2 pigeon2 = new Pigeon2(Constants.PIGEON_ID, "Swerve");
 
     StructArrayPublisher<SwerveModuleState> current_states = Util.table
             .getStructArrayTopic("Current Module States", SwerveModuleState.struct).publish();

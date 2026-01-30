@@ -23,7 +23,7 @@ public class Module {
     public final Swerve.Encoder encoder;
 
     double desiredAngle;
-    PositionVoltage positionRequest = new PositionVoltage(0);
+    PositionVoltage positionRequest = new PositionVoltage(0).withEnableFOC(true);
 
     public static final double WHEEL_DIAMETER = Units.inchesToMeters(4);
     public static final double STEER_REDUCTION = 26;
@@ -71,7 +71,7 @@ public class Module {
         drive.getConfigurator().apply(driveConfig);
 
         tab.addDouble("Absolute Angle", () -> Math.toDegrees(angle()));
-        tab.addDouble("Current Angle", () -> steer.getPosition().getValueAsDouble() * Swerve.PI2);
+        tab.addDouble("Current Angle", () -> steer.getPosition().getValueAsDouble() * 360);
         tab.addDouble("Angle Difference", () -> Math.toDegrees(angle() - (steer.getPosition().getValueAsDouble() * Swerve.PI2)));
         tab.addDouble("Target Angle", () -> Math.toDegrees(desiredAngle));
         tab.addBoolean("Active", encoder::connected);
@@ -120,7 +120,7 @@ public class Module {
 
     public void set(double driveVolts, double targetAngle) {
         double normalized = MathUtil.inputModulus(targetAngle, 0, Swerve.PI2);
-        // syncEncoders();
+        syncEncoders();
         drive.set(driveVolts);
         steer.setControl(positionRequest.withPosition(normalized / Swerve.PI2));
     }
