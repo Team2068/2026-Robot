@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Aimbot;
+import frc.robot.commands.DistanceShoot;
 import frc.robot.subsystems.Swerve.swerveState;
 
 public class AutomatedController {
@@ -81,6 +82,7 @@ public class AutomatedController {
         controller.povRight().and( manual() ).and(() -> {return !io.chassis.active;}).onTrue(new InstantCommand(io.chassis::zeroAbsolute));
 
         controller.a().and( manual()).onTrue(new Aimbot(io, swerveState.SCORING));
+        controller.rightTrigger().and( manual()).onTrue(new DistanceShoot(io));
     }
 
     void configureCharacterisaton(){
