@@ -55,7 +55,7 @@ public class Flywheel extends SubsystemBase {
   }
 
   public double RPM(){
-    return flywheel.getVelocity().getValueAsDouble();
+    return flywheel.getVelocity().getValueAsDouble() * 60;
   }
 
   @Override
