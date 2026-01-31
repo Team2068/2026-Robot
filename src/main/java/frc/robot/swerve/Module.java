@@ -26,7 +26,7 @@ public class Module {
     PositionVoltage positionRequest = new PositionVoltage(0).withEnableFOC(true);
 
     public static final double WHEEL_DIAMETER = Units.inchesToMeters(4);
-    public static final double STEER_REDUCTION = 26;
+    public static final double STEER_REDUCTION = 26.09;
 
     public Module(ShuffleboardLayout tab, int driveID, int steerID, int encoderID, boolean heliumEncoder) {
         drive = new TalonFX(driveID, "Swerve");

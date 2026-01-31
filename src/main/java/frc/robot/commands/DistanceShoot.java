@@ -33,7 +33,7 @@ public class DistanceShoot extends Command {
     io.flywheel.hoodAngle(helper.hoodAngle);
     io.flywheel.RPM(helper.shooterRPM);
 
-    if (Math.abs(io.flywheel.RPM() - helper.shooterRPM) < 50) {
+    if (Math.abs(io.flywheel.RPM() - helper.shooterRPM) < 30) {
       io.feeder.speed(0.5);
     }
   }
@@ -67,6 +67,6 @@ public class DistanceShoot extends Command {
 
   @Override
   public boolean isFinished() {
-    return io.feeder.supplied();
+    return io.feeder.supplied() == false;
   }
 }
