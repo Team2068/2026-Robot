@@ -4,62 +4,70 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.hardware.TalonFX;
 
-//import java.lang.invoke.ClassSpecializer.SpeciesData;
-
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.PersistMode;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
+import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Flywheel extends SubsystemBase{
-  SparkMaxConfig config;
-  SparkMax motor;
-  SparkMaxConfig config2;
-  SparkMax motor2;
+  private final TalonFX flywheel;
+  private final Servo hood;
+
+  VelocityVoltage velocityVoltage = new VelocityVoltage(0);
   /** Creates a new Subsystem. */
   public Flywheel() {
-    config = new SparkMaxConfig();
-    config2 = new SparkMaxConfig();
-    motor = new SparkMax(2, MotorType.kBrushless);
-    motor2 = new SparkMax(3, MotorType.kBrushless);
+    flywheel = new TalonFX(16);
+    hood = new Servo(0);
 
-    config.idleMode(IdleMode.kBrake);
-    motor.configure(config,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    TalonFXConfiguration config = new TalonFXConfiguration();
+    config.Slot0.kV = 0.05;
+    config.Slot0.kP = 0.1;
+    config.Slot0.kI = 0.0;
+    config.Slot0.kD = 0.0;
+    flywheel.getConfigurator().apply(config);
+    }
 
-    config2
-      .inverted(true)
-    .idleMode(IdleMode.kBrake);
-    motor2.configure(config2,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+  public void setVelocity(double RPM){
+    flywheel.setControl(velocityVoltage.withVelocity(RPM / 60.0));
+  }
 
+  public void setPercent(double power){
+    flywheel.set(power);
+  }
+
+  public void setHoodPosition(double position) {
+    hood.setPosition(position);
   }
 
 
-  public void setSpeed(double speed1, double speed2) {
-    motor.set(speed1);
-    motor2.set(speed2);
+  public void setSpeed(double speed) {
+    flywheel.set(speed);
   }
 
-  public void setVoltage(double voltage1, double voltage2) {
-    motor.setVoltage(voltage1);
-    motor2.setVoltage(voltage2);
+  // create a set voltage
+  public void setVoltage(double voltage) {
+    flywheel.set(voltage);
   }
+
 
   public void stop() {
-    motor.stopMotor();
-    motor2.stopMotor();
+    flywheel.stopMotor();
   }
 
-
+  public double getFlywheelRPM() {
+    return flywheel.getVelocity().getValueAsDouble() * 60.0;
+  }
 
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-  }
-  
+    // print rpm to smart dashboard
+    SmartDashboard.putNumber("Hood Angle", hood.get());
+    // print hood position to smart dashboard
+    SmartDashboard.putNumber("Flywheel RPM", getFlywheelRPM());
+    }
 
 }
