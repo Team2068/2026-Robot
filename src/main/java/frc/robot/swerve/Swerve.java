@@ -3,6 +3,7 @@ package frc.robot.swerve;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.pathplanner.lib.config.RobotConfig;
 import com.reduxrobotics.sensors.canandmag.Canandmag;
 import com.reduxrobotics.sensors.canandmag.CanandmagSettings;
 
@@ -11,6 +12,8 @@ import edu.wpi.first.units.measure.AngularVelocity;
 
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+
+import java.io.IOException;
 
 public class Swerve {
 
@@ -35,15 +38,15 @@ public class Swerve {
         public double XControllerD = 0;
         public double ThetaControllerP = 0;
         public double ThetaControllerD = 0;
-        // public RobotConfig autoConfig;
+        public RobotConfig autoConfig;
 
         // BASE CHASSIS CONFIGURATION
         public static final double MAX_VELOCITY = 5.4;
         public static final double MAX_ANGULAR_VELOCITY = Math.PI / 6;
         public static final String[] LAYOUT_TITLE = { "Front Left", "Front Right", "Back Left", "Back Right" };
-        public static final int[] DRIVE_ID = { 2, 3, 4, 5 }; // FL, FR, BL, BR
-        public static final int[] STEER_ID = { 7, 8, 9, 10 }; // FL, FR, BL, BR
-        public static final int[] ENCODER_ID = { 11, 12, 13, 14 }; // FL, FR, BL, BR
+        public static final int[] DRIVE_ID = { 4, 2, 5, 3 }; // FL, FR, BL, BR
+        public static final int[] STEER_ID = { 9, 7, 10, 8 }; // FL, FR, BL, BR
+        public static final int[] ENCODER_ID = { 13, 11, 14, 12 }; // FL, FR, BL, BR
         public static double[] ENCODER_OFFSETS = { -0.87890625, -0.996337890625, -0.638427734375, -0.892822265625 };
         public static final int PIGEON_ID = 6;
 
@@ -51,11 +54,11 @@ public class Swerve {
         public static final Translation2d RED_HUB = new Translation2d(0, 0);
 
         public Constants() {
-            // try {
-            //     autoConfig = RobotConfig.fromGUISettings();
-            // } catch (IOException | org.json.simple.parser.ParseException e) {
-            //     e.printStackTrace();
-            // }
+            try {
+                autoConfig = RobotConfig.fromGUISettings();
+            } catch (IOException | org.json.simple.parser.ParseException e) {
+                e.printStackTrace();
+            }
             SwitchDriver(driver);
         }
 

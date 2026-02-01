@@ -4,6 +4,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Swerve.swerveState;
@@ -12,7 +13,7 @@ import frc.robot.utility.IO;
 public class Aimbot extends Command {
   IO io;
   swerveState state;
-  PIDController pid = new PIDController(1, 0, 0.001); // TODO tune this
+  PIDController pid = new PIDController(0.015, 0, 0.01); // TODO tune this
   boolean blue;
   double target;
 
@@ -41,11 +42,13 @@ public class Aimbot extends Command {
       target = Math.atan2(diff.getY(), diff.getX());
     }
 
-    if(pid.atSetpoint()){
+    SmartDashboard.putNumber("Target", Math.toDegrees(target));
+
+    if(Math.abs((io.chassis.getYaw() - 180) - Math.toDegrees(target)) < 7.5){
       io.chassis.targetRotation = 0.0;
     }
     else{
-      io.chassis.targetRotation = pid.calculate(Math.toRadians(io.chassis.getYaw()), target); // TODO might need to use MathUtil.clamp to make it less jittery
+      io.chassis.targetRotation = pid.calculate(Math.toRadians(io.chassis.getYaw()), target);
     }
   }
 

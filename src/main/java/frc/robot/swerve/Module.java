@@ -90,11 +90,11 @@ public class Module {
     }
 
     public double drivePosition() {
-        return drive.getPosition().getValueAsDouble() * .632 * WHEEL_DIAMETER;
+        return drive.getPosition().getValueAsDouble() * .500 * WHEEL_DIAMETER;
     }
 
     public LinearVelocity velocity() {
-        return MetersPerSecond.of(drive.getVelocity().getValueAsDouble() * Swerve.PI2 * .632 * WHEEL_DIAMETER);
+        return MetersPerSecond.of(drive.getVelocity().getValueAsDouble() * Swerve.PI2 * .500 * WHEEL_DIAMETER);
     }
 
     public Voltage voltage(){

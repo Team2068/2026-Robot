@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -12,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Feeder extends SubsystemBase {
   public SparkMax feeder;
   public DigitalInput beambreak;
-  public SparkMaxConfig config;
+  public SparkMaxConfig config = new SparkMaxConfig();
 
   public Feeder(int feederId, int beambreakId) {
     feeder = new SparkMax(feederId, MotorType.kBrushless);
@@ -20,6 +22,7 @@ public class Feeder extends SubsystemBase {
     
     config.idleMode(IdleMode.kBrake);
     config.smartCurrentLimit(20);
+    feeder.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   public void speed(double speed){

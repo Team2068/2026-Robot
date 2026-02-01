@@ -6,6 +6,9 @@ import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.Radians;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -22,6 +25,7 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -91,21 +95,21 @@ public class Swerve extends SubsystemBase {
 
         estimator = new SwerveDrivePoseEstimator(kinematics, rotation(), modulePositions(), odometry.getPoseMeters());
 
-        // AutoBuilder.configure(
-        //         this::pose,
-        //         this::resetOdometry,
-        //         this::getSpeeds,
-        //         (speeds, feedforwards) -> drive(speeds),
-        //         new PPHolonomicDriveController(
-        //                 new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-        //                 new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-        //         ),
-        //         constants.autoConfig, // The robot configuration
-        //         () -> {
-        //             var alliance = DriverStation.getAlliance();
-        //             return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
-        //         },
-        //         this);
+        AutoBuilder.configure(
+                this::pose,
+                this::resetOdometry,
+                this::getSpeeds,
+                (speeds, feedforwards) -> drive(speeds),
+                new PPHolonomicDriveController(
+                        new PIDConstants(1.7, 0.0, 0.0), // Translation PID constants
+                        new PIDConstants(0.0, 0.0, 0.0) // Rotation PID constants
+                ),
+                constants.autoConfig, // The robot configuration
+                () -> {
+                    var alliance = DriverStation.getAlliance();
+                    return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
+                },
+                this);
     }
 
     private Translation2d createTranslation(double x, double y) {
@@ -146,7 +150,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public double getYaw() {
-        return pigeon2.getYaw().getValueAsDouble();
+        return (pigeon2.getYaw().getValueAsDouble() % 360 + 360) % 360;
     }
 
     public Pose2d pose() {
@@ -277,12 +281,17 @@ public class Swerve extends SubsystemBase {
         SmartDashboard.putNumber("Y position", pose.getY());
 
         SmartDashboard.putNumber("Odometry rotation", rotation().getDegrees());
-        SmartDashboard.putNumber("Pigeon Yaw", pigeon2.getYaw().getValueAsDouble());
+        SmartDashboard.putNumber("Pigeon Yaw", getYaw());
         SmartDashboard.putNumber("Pigeon Pitch",
                 pigeon2.getPitch().getValueAsDouble());
         SmartDashboard.putNumber("Pigeon Roll",
                 pigeon2.getRoll().getValueAsDouble());
 
         SmartDashboard.putString("Drive Mode", (field_oritented) ? "Field-Oriented" : "Robot-Oriented");
+
+        if(targetRotation != null)
+            SmartDashboard.putNumber("Target Rotation", targetRotation * 360);
+        else
+            SmartDashboard.putNumber("Target Rotation", 0.0);
     }
 }
