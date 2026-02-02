@@ -32,10 +32,7 @@ public class Flywheel extends SubsystemBase{
   public void setVelocity(double RPM){
     flywheel.setControl(velocityVoltage.withVelocity(RPM / 60.0));
   }
-
-  public void setPercent(double power){
-    flywheel.set(power);
-  }
+  
 
   public void setHoodPosition(double position) {
     hood.setPosition(position);
@@ -47,10 +44,9 @@ public class Flywheel extends SubsystemBase{
   }
 
   // create a set voltage
-  public void setVoltage(double voltage) {
-    flywheel.set(voltage);
+  public void setVoltage(double volts){
+    flywheel.setVoltage(volts);
   }
-
 
   public void stop() {
     flywheel.stopMotor();
