@@ -17,7 +17,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -56,7 +55,6 @@ public class Swerve extends SubsystemBase {
 
     SwerveDrivePoseEstimator estimator;
 
-    final SwerveDriveOdometry odometry;
     final Module[] modules = new Module[4];
     ChassisSpeeds speeds = new ChassisSpeeds();
     public final Constants constants = new Constants();
@@ -90,10 +88,7 @@ public class Swerve extends SubsystemBase {
                     constants.heliumEncoders);
         }
 
-        odometry = new SwerveDriveOdometry(kinematics, rotation(), modulePositions(),
-                new Pose2d(0, 0, new Rotation2d()));
-
-        estimator = new SwerveDrivePoseEstimator(kinematics, rotation(), modulePositions(), odometry.getPoseMeters());
+        estimator = new SwerveDrivePoseEstimator(kinematics, rotation(), modulePositions(), new Pose2d());
 
         AutoBuilder.configure(
                 this::pose,
@@ -154,7 +149,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public Pose2d pose() {
-        return odometry.getPoseMeters();
+        return estimator.getEstimatedPosition();
     }
 
     public void resetOdometry() {
@@ -165,7 +160,7 @@ public class Swerve extends SubsystemBase {
         pigeon2.setYaw(pose.getRotation().getDegrees());
         resetModulePositions();
 
-        odometry.resetPosition(rotation(), modulePositions(), pose);
+        estimator.resetPosition(rotation(), modulePositions(), pose);
     }
 
     public void resetModulePositions() {
@@ -243,6 +238,10 @@ public class Swerve extends SubsystemBase {
         return pigeon2.getRoll().getValueAsDouble();
     }
 
+    public double getPitch() {
+        return pigeon2.getPitch().getValueAsDouble();
+    }
+
     public void toggle() {
         active = !active;
 
@@ -250,35 +249,49 @@ public class Swerve extends SubsystemBase {
             mod.stop();
     }
 
-    public Pose2d estimatePose() {
-        estimator.update(rotation(), modulePositions());
-        LimelightHelpers.SetRobotOrientation("limelight-main", 0, 0, 0, 0, 0, 0);
+    private void addVisionMeasurement() {
         LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-main");
 
-        if (mt2 == null)
-            return new Pose2d();
-        else if (!(Math.abs(pigeon2.getAngularVelocityXWorld().getValueAsDouble()) > 720 || mt2.tagCount == 0)) {
-            estimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
-            estimator.addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
-            estimatedPosePublisher.set(estimator.getEstimatedPosition());
-        }
-        return mt2.pose;
+        if (mt2 == null || mt2.tagCount == 0)
+            return;
+
+        if (Math.abs(pigeon2.getAngularVelocityZWorld().getValueAsDouble()) > 720)
+            return;
+
+        estimator.setVisionMeasurementStdDevs(
+                VecBuilder.fill(0.7, 0.7, 9999999));
+
+        estimator.addVisionMeasurement(
+                mt2.pose,
+                mt2.timestampSeconds);
+
+        estimatedPosePublisher.set(estimator.getEstimatedPosition());
     }
 
     public void periodic() {
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
-        if (active && speeds != new ChassisSpeeds())
+        if (active && !speeds.equals(new ChassisSpeeds()))
             setModuleStates(states);
 
         current_states.set(moduleStates(modules));
         target_states.set(states);
 
-        Pose2d pose = odometry.update(rotation(), modulePositions());
-        estimatePose();
-        posePublisher.set(pose);
+        estimator.update(rotation(), modulePositions());
 
-        SmartDashboard.putNumber("X position", pose.getX());
-        SmartDashboard.putNumber("Y position", pose.getY());
+        LimelightHelpers.SetRobotOrientation(
+                "limelight-main",
+                rotation().getDegrees(),
+                0,
+                pigeon2.getPitch().getValueAsDouble(),
+                0,
+                pigeon2.getRoll().getValueAsDouble(),
+                0);
+
+        addVisionMeasurement();
+        posePublisher.set(estimator.getEstimatedPosition());
+
+        SmartDashboard.putNumber("X position", pose().getX());
+        SmartDashboard.putNumber("Y position", pose().getY());
 
         SmartDashboard.putNumber("Odometry rotation", rotation().getDegrees());
         SmartDashboard.putNumber("Pigeon Yaw", getYaw());
@@ -289,7 +302,7 @@ public class Swerve extends SubsystemBase {
 
         SmartDashboard.putString("Drive Mode", (field_oritented) ? "Field-Oriented" : "Robot-Oriented");
 
-        if(targetRotation != null)
+        if (targetRotation != null)
             SmartDashboard.putNumber("Target Rotation", targetRotation * 360);
         else
             SmartDashboard.putNumber("Target Rotation", 0.0);
