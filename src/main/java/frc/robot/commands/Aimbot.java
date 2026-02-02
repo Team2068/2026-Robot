@@ -16,10 +16,17 @@ public class Aimbot extends Command {
   PIDController pid = new PIDController(0.015, 0, 0.01); // TODO tune this
   boolean blue;
   double target;
+  boolean auton = false;
 
   public Aimbot(IO io, swerveState state) {
     this.io = io;
     this.state = state;
+  }
+
+  public Aimbot(IO io, swerveState state, boolean auton) {
+    this.io = io;
+    this.state = state;
+    auton = true;
   }
 
   @Override
@@ -59,6 +66,6 @@ public class Aimbot extends Command {
 
   @Override
   public boolean isFinished() {
-    return (io.chassis.currentState != state);
+    return auton ? Math.abs((io.chassis.getYaw() - 180) - Math.toDegrees(target)) < 7.5 : (io.chassis.currentState != state);
   }
 }
