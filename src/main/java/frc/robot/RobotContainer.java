@@ -28,8 +28,8 @@ import frc.robot.subsystems.Swerve.swerveState;
 public class RobotContainer {
   public IO io = new IO();
   public final AutomatedController main;
-  public static final Translation2d BLUE_HUB = new Translation2d(4.55, 4);
-  public static final Translation2d RED_HUB = new Translation2d(3.6423, 0); // TODO: Red hub value needs to be found
+  public static final Translation2d BLUE_HUB = new Translation2d(4.612, 4.030);
+  public static final Translation2d RED_HUB = new Translation2d(11.917, 4.030);
       StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault().getTable("Debug")
             .getStructTopic("Blue Hub Pose", Pose2d.struct).publish();
 
