@@ -261,14 +261,11 @@ public class Swerve extends SubsystemBase {
         estimator.setVisionMeasurementStdDevs(
                 VecBuilder.fill(0.7, 0.7, 9999999));
 
-        if (Math.abs(mt2.pose.getX() - estimator.getEstimatedPosition().getX()) < 3
-                && Math.abs(mt2.pose.getY() - estimator.getEstimatedPosition().getY()) < 3) {
-            estimator.addVisionMeasurement(
-                    mt2.pose,
-                    mt2.timestampSeconds);
+        estimator.addVisionMeasurement(
+                mt2.pose,
+                mt2.timestampSeconds);
 
-            estimatedPosePublisher.set(estimator.getEstimatedPosition());
-        }
+        estimatedPosePublisher.set(estimator.getEstimatedPosition());
     }
 
     public void periodic() {
