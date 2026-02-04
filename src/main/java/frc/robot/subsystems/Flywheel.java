@@ -54,6 +54,10 @@ public class Flywheel extends SubsystemBase {
     hood.setAngle(degrees);
   }
 
+  public double hoodAngle(){
+    return hood.getAngle();
+  }
+
   public double RPM(){
     return flywheel.getVelocity().getValueAsDouble() * 60;
   }

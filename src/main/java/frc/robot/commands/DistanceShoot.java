@@ -12,6 +12,8 @@ import frc.robot.utility.IO;
 public class DistanceShoot extends Command {
   IO io;
   boolean blue;
+  int rpmTolerance = 50;
+  double angleTolerance = 1.5;
 
   DistanceShootUtil[] data = { new DistanceShootUtil(0, 0, 0) };
 
@@ -33,7 +35,7 @@ public class DistanceShoot extends Command {
     io.flywheel.hoodAngle(helper.hoodAngle);
     io.flywheel.RPM(helper.shooterRPM);
 
-    if (Math.abs(io.flywheel.RPM() - helper.shooterRPM) < 30) {
+    if (Math.abs(io.flywheel.RPM() - helper.shooterRPM) < rpmTolerance && Math.abs(io.flywheel.hoodAngle() - helper.hoodAngle) < angleTolerance) {
       io.feeder.speed(0.5);
     }
   }
