@@ -28,6 +28,7 @@ public class Flywheel extends SubsystemBase {
     config.CurrentLimits.SupplyCurrentLimit = 20;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.Slot0.kP = 0.0;
+    config.Slot0.kD = 0.0;
     config.Slot0.kV = 0.0;
 
     flywheel.getConfigurator().apply(config);
