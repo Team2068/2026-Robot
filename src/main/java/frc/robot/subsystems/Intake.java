@@ -14,7 +14,6 @@ public class Intake extends SubsystemBase {
   public SparkMax intake;
   public SparkMaxConfig config;
 
-  public double intakeSpeed;
   private boolean active;
 
 
@@ -44,7 +43,7 @@ public class Intake extends SubsystemBase {
 
   public void intake(){
     if(active)
-      speed(intakeSpeed);
+      speed(1);
     else
       stop();
   }
