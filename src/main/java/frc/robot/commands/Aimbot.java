@@ -45,7 +45,7 @@ public class Aimbot extends Command {
       target = blue ? Math.toRadians(0) : Math.toRadians(180);
     } else if (state == swerveState.SCORING) {
       Translation2d hub = blue ? RobotContainer.BLUE_HUB : RobotContainer.RED_HUB;
-      Translation2d diff = hub.minus(io.chassis.pose().getTranslation());
+      Translation2d diff = hub.minus(io.chassis.getEstimatedPose().getTranslation());
       target = Math.atan2(diff.getY(), diff.getX());
     }
 
