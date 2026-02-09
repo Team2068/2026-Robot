@@ -250,7 +250,7 @@ StructPublisher<Pose2d> estimatedPublisher = NetworkTableInstance.getDefault().g
             mod.stop();
     }
 
-    public Pose2d estimatePose() {
+    public void estimatePose() {
         estimator.update(rotation(), modulePositions());
         LimelightHelpers.SetRobotOrientation("limelight-main", pigeon2.getYaw().getValueAsDouble(), 0, pigeon2.getPitch().getValueAsDouble(), 0, pigeon2.getRoll().getValueAsDouble(), 0);
         LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-main");
@@ -275,9 +275,7 @@ StructPublisher<Pose2d> estimatedPublisher = NetworkTableInstance.getDefault().g
                     mt1.pose,
                     mt1.timestampSeconds);
             estimatedPublisher.set(estimator.getEstimatedPosition());
-            return mt1.pose;
         }
-        return estimator.getEstimatedPosition();
     }
 
     public Pose2d getEstimatedPose(){
