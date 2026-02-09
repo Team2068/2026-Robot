@@ -252,27 +252,12 @@ StructPublisher<Pose2d> estimatedPublisher = NetworkTableInstance.getDefault().g
 
     public Pose2d estimatePose() {
         estimator.update(rotation(), modulePositions());
-        LimelightHelpers.SetRobotOrientation("limelight-main", pigeon2.getYaw().getValueAsDouble() - 180, 0, pigeon2.getPitch().getValueAsDouble() - 180, 0, pigeon2.getRoll().getValueAsDouble() - 180, 0);
-        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-main");
-
-        if (mt2 == null)
-            return estimator.getEstimatedPosition();
-        else if (!(Math.abs(pigeon2.getAngularVelocityXWorld().getValueAsDouble()) > 720 || mt2.tagCount == 0)) {
-            estimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.03, 0.03, 9999999));
-            estimator.addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
-            estimatedPublisher.set(estimator.getEstimatedPosition());
-        }
-        return mt2.pose;
-    }
-
-    public Pose2d estimatePoseMegaTag1() {
-        estimator.update(rotation(), modulePositions());
         LimelightHelpers.SetRobotOrientation("limelight-main", pigeon2.getYaw().getValueAsDouble(), 0, pigeon2.getPitch().getValueAsDouble(), 0, pigeon2.getRoll().getValueAsDouble(), 0);
         LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-main");
         boolean doRejectUpdate = false;
 
         if (mt1.tagCount == 1 && mt1.rawFiducials.length == 1) {
-            if (mt1.rawFiducials[0].ambiguity > .5) {
+            if (mt1.rawFiducials[0].ambiguity > .30) {
                 doRejectUpdate = true;
             }
             if (mt1.rawFiducials[0].distToCamera > 3) {
@@ -285,7 +270,7 @@ StructPublisher<Pose2d> estimatedPublisher = NetworkTableInstance.getDefault().g
         }
 
         if (!doRejectUpdate) {
-            estimator.setVisionMeasurementStdDevs(VecBuilder.fill(.0, .0, 9999999));
+            estimator.setVisionMeasurementStdDevs(VecBuilder.fill(.05, .07, 9999999));
             estimator.addVisionMeasurement(
                     mt1.pose,
                     mt1.timestampSeconds);
@@ -308,7 +293,7 @@ StructPublisher<Pose2d> estimatedPublisher = NetworkTableInstance.getDefault().g
         target_states.set(states);
 
         Pose2d pose = odometry.update(rotation(), modulePositions());
-        estimatePoseMegaTag1();
+        estimatePose();
         posePublisher.set(pose);
         estimatedPublisher.set(estimator.getEstimatedPosition());
 
