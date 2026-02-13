@@ -60,7 +60,7 @@ public class Flywheel extends SubsystemBase {
   }
 
   public void hoodAngle(double angle){
-    hood.getClosedLoopController().setSetpoint(angle, ControlType.kPosition);
+    hood.getClosedLoopController().setSetpoint(angle / 360.0, ControlType.kPosition);
   }
 
   public double hoodAngle(){
