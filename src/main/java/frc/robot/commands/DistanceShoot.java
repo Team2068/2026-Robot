@@ -63,7 +63,8 @@ public class DistanceShoot extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    io.flywheel.stop();
+    io.flywheel.stopFlywheel();
+    io.flywheel.stopHood();
     io.feeder.stop();
   }
 

@@ -10,38 +10,48 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Flywheel extends SubsystemBase {
   public SparkMax flywheel;
-  public SparkMaxConfig config;
-  Servo hood;
+  public SparkMaxConfig flywheelConfig;
+  public SparkMaxConfig hoodConfig;
+  public SparkMax hood;
 
   public VelocityVoltage control = new VelocityVoltage(0);
 
   public Flywheel(int shooterId, int hoodId) {
     flywheel = new SparkMax(shooterId, MotorType.kBrushless);
-    hood = new Servo(hoodId);
+    hood = new SparkMax(hoodId, MotorType.kBrushless);
 
-    config = new SparkMaxConfig();
-    config.idleMode(IdleMode.kBrake);
-    config.closedLoop.pid(0.2, 0, 0);
-    config.smartCurrentLimit(40);
-    flywheel.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    flywheelConfig = new SparkMaxConfig();
+    flywheelConfig.idleMode(IdleMode.kBrake);
+    flywheelConfig.closedLoop.pid(0.2, 0, 0);
+    flywheelConfig.smartCurrentLimit(40);
+    flywheel.configure(flywheelConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    hoodConfig = new SparkMaxConfig();
+    hoodConfig.idleMode(IdleMode.kBrake);
+    hoodConfig.closedLoop.pid(0.2, 0, 0);
+    hoodConfig.smartCurrentLimit(40);
+    hood.configure(hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
-  public void speed(double speed){
+  public void flywheelSpeed(double speed){
     flywheel.set(speed);
   }
 
-  public void volts(double volts){
+  public void flywheelVolts(double volts){
     flywheel.setVoltage(volts);
   }
 
-  public void stop(){
+  public void stopFlywheel(){
     flywheel.stopMotor();
+  }
+
+  public void stopHood(){
+    hood.stopMotor();
   }
 
   public void RPM(double rpm){
@@ -49,12 +59,12 @@ public class Flywheel extends SubsystemBase {
     flywheel.getClosedLoopController().setSetpoint(rpm, ControlType.kVelocity);
   }
 
-  public void hoodAngle(double degrees){
-    hood.setAngle(degrees);
+  public void hoodAngle(double angle){
+    hood.getClosedLoopController().setSetpoint(angle, ControlType.kPosition);
   }
 
   public double hoodAngle(){
-    return hood.getAngle();
+    return hood.getEncoder().getPosition() * 360;
   }
 
   public double RPM(){
@@ -63,7 +73,7 @@ public class Flywheel extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Hood Angle", hood.getAngle());
+    SmartDashboard.putNumber("Hood Angle", hoodAngle());
     SmartDashboard.putNumber("Shooter RPM", RPM());
   }
 }
