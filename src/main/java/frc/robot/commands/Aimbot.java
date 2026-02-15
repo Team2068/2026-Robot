@@ -80,6 +80,6 @@ public class Aimbot extends Command {
 
   @Override
   public boolean isFinished() {
-    return auton ? Math.abs((io.chassis.getYaw() - 180) - Math.toDegrees(target)) < 7.5 : (io.chassis.currentState != state);
+    return auton ? (Math.abs((Math.toRadians(io.chassis.getEstimatedRotation())) - target) < Math.toRadians(3)) : (io.chassis.currentState != state);
   }
 }

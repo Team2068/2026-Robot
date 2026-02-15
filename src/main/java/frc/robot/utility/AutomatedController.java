@@ -76,16 +76,19 @@ public class AutomatedController {
 
     public void configureManual(){
         controller.back().and(manual()).onTrue(Util.Do(io.chassis::resetOdometry, io.chassis));
-        
-        controller.povDown().and( manual() ).onTrue(Util.Do(io.chassis::toggle));
-        controller.povLeft().and( manual() ).onTrue(Util.Do(io.chassis::syncEncoders));
-        controller.povRight().and( manual() ).and(() -> {return !io.chassis.active;}).onTrue(new InstantCommand(io.chassis::zeroAbsolute));
 
+        // AIMBOT
         controller.a().and( manual()).onTrue(new Aimbot(io, swerveState.SCORING));
         controller.b().and( manual()).onTrue(Util.Do(()-> io.chassis.currentState = swerveState.DEFAULT));
-        controller.rightTrigger().and( manual()).onTrue(new DistanceShoot(io));
+
+        // SHOOTING (Currently set to manual mode)
+        controller.rightTrigger().and( manual()).onTrue(new DistanceShoot(io, new DistanceShootUtil(2, 0, 6000)));
+
+        // INTAKE
         controller.y().and( manual()).onTrue(Util.Do(io.intake::intake));
         controller.x().and( manual()).onTrue(Util.Do(()-> io.intake.speed(1))).onFalse(Util.Do(io.intake::stop));
+
+
     }
 
     void configureCharacterisaton(){
@@ -102,6 +105,10 @@ public class AutomatedController {
 
     void configureDebug(){
         controller.back().and(debug()).onTrue(Util.Do(io.chassis::resetOdometry, io.chassis));
+
+        controller.povDown().and( manual() ).onTrue(Util.Do(io.chassis::toggle));
+        controller.povLeft().and( manual() ).onTrue(Util.Do(io.chassis::syncEncoders));
+        controller.povRight().and( manual() ).and(() -> {return !io.chassis.active;}).onTrue(new InstantCommand(io.chassis::zeroAbsolute));
     }
 
 }
