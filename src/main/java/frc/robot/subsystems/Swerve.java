@@ -286,6 +286,10 @@ public class Swerve extends SubsystemBase {
         return estimator.getEstimatedPosition();
     }
 
+    public double getEstimatedRotation(){
+        return getEstimatedPose().getRotation().getDegrees();
+    }
+
     public void periodic() {
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
         if (active && speeds != new ChassisSpeeds())
@@ -303,11 +307,11 @@ public class Swerve extends SubsystemBase {
 
         if ((int) (timer.get()) % 10 == 0) {
             syncEncoders();
-            timer.restart(); // TODO make sure this is restarting the timer
         }
 
         SmartDashboard.putNumber("X position", pose.getX());
         SmartDashboard.putNumber("Y position", pose.getY());
+        SmartDashboard.putNumber("Estimated Rotation", getEstimatedRotation());
 
         SmartDashboard.putNumber("Odometry rotation", rotation().getDegrees());
         SmartDashboard.putNumber("Pigeon Yaw", getYaw());

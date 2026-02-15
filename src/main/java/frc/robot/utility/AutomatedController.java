@@ -82,8 +82,9 @@ public class AutomatedController {
         controller.povRight().and( manual() ).and(() -> {return !io.chassis.active;}).onTrue(new InstantCommand(io.chassis::zeroAbsolute));
 
         controller.a().and( manual()).onTrue(new Aimbot(io, swerveState.SCORING));
+        controller.b().and( manual()).onTrue(Util.Do(()-> io.chassis.currentState = swerveState.DEFAULT));
         controller.rightTrigger().and( manual()).onTrue(new DistanceShoot(io));
-        controller.b().and( manual()).onTrue(Util.Do(io.intake::intake));
+        controller.y().and( manual()).onTrue(Util.Do(io.intake::intake));
         controller.x().and( manual()).onTrue(Util.Do(()-> io.intake.speed(1))).onFalse(Util.Do(io.intake::stop));
     }
 
