@@ -303,6 +303,7 @@ public class Swerve extends SubsystemBase {
 
         if ((int) (timer.get()) % 10 == 0) {
             syncEncoders();
+            timer.restart(); // TODO make sure this is restarting the timer
         }
 
         SmartDashboard.putNumber("X position", pose.getX());

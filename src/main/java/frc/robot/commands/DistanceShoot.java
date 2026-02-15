@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
@@ -12,36 +13,50 @@ import frc.robot.utility.IO;
 public class DistanceShoot extends Command {
   IO io;
   boolean blue;
-  int rpmTolerance = 50;
-  double angleTolerance = 1.5;
+  private static final int RPM_TOLERANCE = 50;
+  private static final double ANGLE_TOLERANCE = 1.5;
+
+  Timer timer = new Timer();
 
   DistanceShootUtil[] data = { new DistanceShootUtil(0, 0, 0) };
 
+  DistanceShootUtil distanceUtil = null;
+
   public DistanceShoot(IO io) {
-    addRequirements(io.flywheel);
+    this.io = io;
+    addRequirements(io.flywheel, io.feeder);
   }
 
-  // TODO make this a mode to shoot at preset values
-  public DistanceShoot(IO io, DistanceShootUtil measurements){
-    addRequirements(io.flywheel);
+  public DistanceShoot(IO io, DistanceShootUtil distanceUtil) {
+    this.io = io;
+    addRequirements(io.flywheel, io.feeder);
+    this.distanceUtil = distanceUtil;
   }
 
   @Override
   public void initialize() {
     blue = DriverStation.getAlliance().get() == Alliance.Blue;
+    timer.start();
   }
 
   @Override
   public void execute() {
-    Translation2d hub = blue ? RobotContainer.BLUE_HUB : RobotContainer.RED_HUB;
-    Translation2d diff = hub.minus(io.chassis.pose().getTranslation());
-    DistanceShootUtil helper = calculateFlywheel(Math.hypot(diff.getY(), diff.getX()));
+    DistanceShootUtil helper;
+
+    if (distanceUtil == null) {
+      Translation2d hub = blue ? RobotContainer.BLUE_HUB : RobotContainer.RED_HUB;
+      Translation2d diff = hub.minus(io.chassis.pose().getTranslation());
+      helper = calculateFlywheel(Math.hypot(diff.getY(), diff.getX()));
+    } else {
+      helper = distanceUtil;
+    }
 
     io.flywheel.hoodAngle(helper.hoodAngle);
     io.flywheel.RPM(helper.shooterRPM);
 
-    if (Math.abs(io.flywheel.RPM() - helper.shooterRPM) < rpmTolerance && Math.abs(io.flywheel.hoodAngle() - helper.hoodAngle) < angleTolerance) {
-      io.feeder.speed(0.5);
+    if (Math.abs(io.flywheel.RPM() - helper.shooterRPM) < RPM_TOLERANCE
+        && Math.abs(io.flywheel.hoodAngle() - helper.hoodAngle) < ANGLE_TOLERANCE) {
+      io.feeder.speed(1);
     }
   }
 
@@ -75,6 +90,7 @@ public class DistanceShoot extends Command {
 
   @Override
   public boolean isFinished() {
-    return io.feeder.supplied() == false;
+    // TODO find actual time or if we get the servo attached change to servo code or just have it be a trigger you hold down
+    return timer.get() > 10;
   }
 }

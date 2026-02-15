@@ -3,9 +3,8 @@ package frc.robot.subsystems;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -15,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Feeder extends SubsystemBase {
   public SparkFlex feeder;
   public DigitalInput beambreak;
-  public SparkMaxConfig config = new SparkMaxConfig();
+  public SparkFlexConfig config = new SparkFlexConfig();
 
   public Feeder(int feederId, int beambreakId) {
     feeder = new SparkFlex(feederId, MotorType.kBrushless);

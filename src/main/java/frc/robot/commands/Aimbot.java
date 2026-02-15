@@ -26,7 +26,7 @@ public class Aimbot extends Command {
   public Aimbot(IO io, swerveState state, boolean auton) {
     this.io = io;
     this.state = state;
-    auton = true;
+    this.auton = auton;
   }
 
   @Override
@@ -42,7 +42,7 @@ public class Aimbot extends Command {
   public void execute() {
     // TODO Get all values
     if (state == swerveState.PASSING) {
-      target = blue ? Math.toRadians(0) : Math.toRadians(180);
+      target = blue ? 0 : Math.PI;
     } else if (state == swerveState.SCORING) {
       Translation2d hub = blue ? RobotContainer.BLUE_HUB : RobotContainer.RED_HUB;
       Translation2d diff = hub.minus(io.chassis.getEstimatedPose().getTranslation());
@@ -50,12 +50,20 @@ public class Aimbot extends Command {
     }
 
     SmartDashboard.putNumber("Target", Math.toDegrees(target));
+    
+    // TODO see what happens when I switch io.chassis.getYaw to the estimatedPose's yaw
+    // if(Math.abs((io.chassis.getYaw() - 180) - Math.toDegrees(target)) < 7.5){
+    //   io.chassis.targetRotation = 0.0;
+    // }
+    // else{
+    //   io.chassis.targetRotation = pid.calculate(Math.toRadians(io.chassis.getYaw()), target);
+    // }
 
-    if(Math.abs((io.chassis.getYaw() - 180) - Math.toDegrees(target)) < 7.5){
+    if(Math.abs((io.chassis.getEstimatedPose().getRotation().getRadians()) - target) < 0.1308){
       io.chassis.targetRotation = 0.0;
     }
     else{
-      io.chassis.targetRotation = pid.calculate(Math.toRadians(io.chassis.getYaw()), target);
+      io.chassis.targetRotation = pid.calculate(io.chassis.getEstimatedPose().getRotation().getRadians(), target);
     }
   }
 
