@@ -26,6 +26,7 @@ import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -51,7 +52,7 @@ public class Swerve extends SubsystemBase {
             .getStructArrayTopic("Target Module States", SwerveModuleState.struct).publish();
     StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault().getTable("Debug")
             .getStructTopic("Current pose", Pose2d.struct).publish();
-StructPublisher<Pose2d> estimatedPublisher = NetworkTableInstance.getDefault().getTable("Debug")
+    StructPublisher<Pose2d> estimatedPublisher = NetworkTableInstance.getDefault().getTable("Debug")
             .getStructTopic("Estimated pose", Pose2d.struct).publish();
 
     SwerveDrivePoseEstimator estimator;
@@ -60,6 +61,7 @@ StructPublisher<Pose2d> estimatedPublisher = NetworkTableInstance.getDefault().g
     final Module[] modules = new Module[4];
     ChassisSpeeds speeds = new ChassisSpeeds();
     public final Constants constants = new Constants();
+    Timer timer = new Timer();
 
     public boolean active = true;
 
@@ -110,6 +112,8 @@ StructPublisher<Pose2d> estimatedPublisher = NetworkTableInstance.getDefault().g
                     return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
                 },
                 this);
+
+        timer.start();
     }
 
     private Translation2d createTranslation(double x, double y) {
@@ -252,7 +256,8 @@ StructPublisher<Pose2d> estimatedPublisher = NetworkTableInstance.getDefault().g
 
     public void estimatePose() {
         estimator.update(rotation(), modulePositions());
-        LimelightHelpers.SetRobotOrientation("limelight-main", pigeon2.getYaw().getValueAsDouble(), 0, pigeon2.getPitch().getValueAsDouble(), 0, pigeon2.getRoll().getValueAsDouble(), 0);
+        LimelightHelpers.SetRobotOrientation("limelight-main", pigeon2.getYaw().getValueAsDouble(), 0,
+                pigeon2.getPitch().getValueAsDouble(), 0, pigeon2.getRoll().getValueAsDouble(), 0);
         LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-main");
         boolean doRejectUpdate = false;
 
@@ -264,13 +269,12 @@ StructPublisher<Pose2d> estimatedPublisher = NetworkTableInstance.getDefault().g
                 doRejectUpdate = true;
             }
         }
-        if (mt1.tagCount 
-          == 0) {
+        if (mt1.tagCount == 0) {
             doRejectUpdate = true;
         }
 
         if (!doRejectUpdate) {
-            estimator.setVisionMeasurementStdDevs(VecBuilder.fill(.05, .07, 9999999));
+            estimator.setVisionMeasurementStdDevs(VecBuilder.fill(.05, .07, 0.5));
             estimator.addVisionMeasurement(
                     mt1.pose,
                     mt1.timestampSeconds);
@@ -278,7 +282,7 @@ StructPublisher<Pose2d> estimatedPublisher = NetworkTableInstance.getDefault().g
         }
     }
 
-    public Pose2d getEstimatedPose(){
+    public Pose2d getEstimatedPose() {
         return estimator.getEstimatedPosition();
     }
 
@@ -294,6 +298,12 @@ StructPublisher<Pose2d> estimatedPublisher = NetworkTableInstance.getDefault().g
         estimatePose();
         posePublisher.set(pose);
         estimatedPublisher.set(estimator.getEstimatedPosition());
+
+        SmartDashboard.putNumber("Timer", timer.get());
+
+        if ((int) (timer.get()) % 10 == 0) {
+            syncEncoders();
+        }
 
         SmartDashboard.putNumber("X position", pose.getX());
         SmartDashboard.putNumber("Y position", pose.getY());

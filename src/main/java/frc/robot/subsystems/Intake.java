@@ -43,7 +43,7 @@ public class Intake extends SubsystemBase {
 
   public void intake(){
     if(!active)
-      speed(-1);
+      speed(-0.6);
     else
       stop();
   }

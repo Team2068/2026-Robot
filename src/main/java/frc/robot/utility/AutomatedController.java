@@ -84,6 +84,7 @@ public class AutomatedController {
         controller.a().and( manual()).onTrue(new Aimbot(io, swerveState.SCORING));
         controller.rightTrigger().and( manual()).onTrue(new DistanceShoot(io));
         controller.b().and( manual()).onTrue(Util.Do(io.intake::intake));
+        controller.x().and( manual()).onTrue(Util.Do(()-> io.intake.speed(1))).onFalse(Util.Do(io.intake::stop));
     }
 
     void configureCharacterisaton(){

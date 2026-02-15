@@ -21,6 +21,11 @@ public class DistanceShoot extends Command {
     addRequirements(io.flywheel);
   }
 
+  // TODO make this a mode to shoot at preset values
+  public DistanceShoot(IO io, DistanceShootUtil measurements){
+    addRequirements(io.flywheel);
+  }
+
   @Override
   public void initialize() {
     blue = DriverStation.getAlliance().get() == Alliance.Blue;

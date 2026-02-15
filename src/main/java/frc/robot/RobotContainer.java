@@ -59,8 +59,8 @@ public class RobotContainer {
   }
 
   public void configureAuton() {
-    NamedCommands.registerCommand("Aimbot", new Aimbot(io, swerveState.SCORING, true));
-    NamedCommands.registerCommand("DistanceShoot", new DistanceShoot(io));
+    // NamedCommands.registerCommand("Aimbot", new Aimbot(io, swerveState.SCORING, true));
+    // NamedCommands.registerCommand("DistanceShoot", new DistanceShoot(io));
   }
 
   public Command getAutonomousCommand() {
