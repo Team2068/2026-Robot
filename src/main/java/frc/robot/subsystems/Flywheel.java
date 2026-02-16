@@ -63,17 +63,21 @@ public class Flywheel extends SubsystemBase {
     hood.stopMotor();
   }
 
+  public void hoodSpeed(double speed){
+    hood.set(speed);
+  }
+
   public void RPM(double rpm) {
     rpm = MathUtil.clamp(rpm, 0.0, 6000.0);
     flywheel.setControl(control.withVelocity(rpm / 60.0));
   }
 
   public void hoodAngle(double angle) {
-    hood.getClosedLoopController().setSetpoint(angle / 360.0, ControlType.kPosition);
+    hood.getClosedLoopController().setSetpoint(angle, ControlType.kPosition);
   }
 
   public double hoodAngle() {
-    return hood.getEncoder().getPosition() * 360;
+    return hood.getEncoder().getPosition();
   }
 
   public double RPM() {
