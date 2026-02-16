@@ -110,7 +110,7 @@ public class AutomatedController {
         controller.povLeft().and( debug() ).onTrue(Util.Do(io.chassis::syncEncoders));
         controller.povRight().and( debug() ).and(() -> {return !io.chassis.active;}).onTrue(new InstantCommand(io.chassis::zeroAbsolute));
 
-        controller.a().and( debug()).onTrue(Util.Do(()-> io.flywheel.hoodAngle(-30)));
+        controller.a().and( debug()).onTrue(Util.Do(()-> io.flywheel.hoodAngle(-0.5)));
         controller.b().and( debug()).onTrue(Util.Do(io.flywheel::stopHood));
 
         controller.leftBumper().and( debug()).onTrue(Util.Do(() -> io.flywheel.hoodSpeed(0.1))).onFalse(Util.Do(io.flywheel::stopHood));
