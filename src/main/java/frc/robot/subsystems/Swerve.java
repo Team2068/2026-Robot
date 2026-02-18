@@ -26,6 +26,7 @@ import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -43,7 +44,7 @@ public class Swerve extends SubsystemBase {
     public boolean field_oritented = true;
     private final SwerveDriveKinematics kinematics;
 
-    public final Pigeon2 pigeon2 = new Pigeon2(Constants.PIGEON_ID);
+    public final Pigeon2 pigeon2 = new Pigeon2(Constants.PIGEON_ID, "Swerve");
 
     StructArrayPublisher<SwerveModuleState> current_states = Util.table
             .getStructArrayTopic("Current Module States", SwerveModuleState.struct).publish();
@@ -51,17 +52,26 @@ public class Swerve extends SubsystemBase {
             .getStructArrayTopic("Target Module States", SwerveModuleState.struct).publish();
     StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault().getTable("Debug")
             .getStructTopic("Current pose", Pose2d.struct).publish();
-    StructPublisher<Pose2d> estimatedPosePublisher = Util.table
-            .getStructTopic("Estimated Pose", Pose2d.struct).publish();
+    StructPublisher<Pose2d> estimatedPublisher = NetworkTableInstance.getDefault().getTable("Debug")
+            .getStructTopic("Estimated pose", Pose2d.struct).publish();
 
     SwerveDrivePoseEstimator estimator;
- 
+
     final SwerveDriveOdometry odometry;
     final Module[] modules = new Module[4];
     ChassisSpeeds speeds = new ChassisSpeeds();
     public final Constants constants = new Constants();
+    Timer timer = new Timer();
 
     public boolean active = true;
+
+    public static enum swerveState {
+        DEFAULT, SCORING, PASSING
+    }
+
+    public Double targetRotation = null;
+
+    public swerveState currentState = swerveState.DEFAULT;
 
     public Swerve() {
         kinematics = new SwerveDriveKinematics(
@@ -76,8 +86,8 @@ public class Swerve extends SubsystemBase {
                     tab.getLayout(Constants.LAYOUT_TITLE[i], BuiltInLayouts.kList)
                             .withSize(2, 4)
                             .withPosition(i * 2, 0),
-                    Constants.CHASSIS_ID[i],
-                    Constants.CHASSIS_ID[i],
+                    Constants.DRIVE_ID[i],
+                    Constants.STEER_ID[i],
                     Constants.ENCODER_ID[i],
                     constants.heliumEncoders);
         }
@@ -91,17 +101,19 @@ public class Swerve extends SubsystemBase {
                 this::pose,
                 this::resetOdometry,
                 this::getSpeeds,
-                this::drive,
+                (speeds, feedforwards) -> drive(speeds),
                 new PPHolonomicDriveController(
-                        new PIDConstants(constants.XControllerP, 0.0, constants.XControllerD), // Translation PID
-                        new PIDConstants(constants.ThetaControllerP, 0, constants.ThetaControllerD, 0.0) // Rotation PID
+                        new PIDConstants(1.7, 0.0, 0.0), // Translation PID constants
+                        new PIDConstants(0.0, 0.0, 0.0) // Rotation PID constants
                 ),
-                constants.autoConfig,
+                constants.autoConfig, // The robot configuration
                 () -> {
                     var alliance = DriverStation.getAlliance();
                     return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
                 },
                 this);
+
+        timer.start();
     }
 
     private Translation2d createTranslation(double x, double y) {
@@ -141,8 +153,8 @@ public class Swerve extends SubsystemBase {
         return pos;
     }
 
-    public double getYaw(){
-        return pigeon2.getYaw().getValueAsDouble();
+    public double getYaw() {
+        return (pigeon2.getYaw().getValueAsDouble() % 360 + 360) % 360;
     }
 
     public Pose2d pose() {
@@ -183,7 +195,6 @@ public class Swerve extends SubsystemBase {
         SwerveDriveKinematics.desaturateWheelSpeeds(states, Constants.MAX_VELOCITY);
         for (int i = 0; i < modules.length; i++) {
             states[i].optimize(new Rotation2d(modules[i].angle()));
-            // states[i].cosineScale(new Rotation2d(modules[i].angle())); // TODO Test how Cosine compensation affects Swerve
             modules[i].set((states[i].speedMetersPerSecond / Constants.MAX_VELOCITY) * .8,
                     states[i].angle.getRadians());
         }
@@ -209,11 +220,13 @@ public class Swerve extends SubsystemBase {
                 for (Module mod : modules)
                     mod.set(voltage.magnitude(), 0);
             }, log -> {
-                    log.motor(Constants.LAYOUT_TITLE[0] + " [Drive]")
-                            .voltage(modules[0].voltage())
-                            .linearPosition(distance[0].mut_replace(modules[0].drivePosition(), Meters))
-                            .linearVelocity(modules[0].velocity())
-                            .linearAcceleration(pigeon2.getAccelerationX().getValue()); // NOTE: This is due to our gyro being mounted 90 degrees off centre
+                log.motor(Constants.LAYOUT_TITLE[0] + " [Drive]")
+                        .voltage(modules[0].voltage())
+                        .linearPosition(distance[0].mut_replace(modules[0].drivePosition(), Meters))
+                        .linearVelocity(modules[0].velocity())
+                        .linearAcceleration(pigeon2.getAccelerationX().getValue()); // NOTE: This is due to our gyro
+                                                                                    // being mounted 90 degrees off
+                                                                                    // centre
             }, this));
 
     public final SysIdRoutine steerRoutine = new SysIdRoutine(new Config(
@@ -222,12 +235,12 @@ public class Swerve extends SubsystemBase {
             null,
             null),
             new SysIdRoutine.Mechanism(voltage -> {
-                speeds = new ChassisSpeeds(0, 0, (voltage.magnitude()/16.0) * Constants.MAX_ANGULAR_VELOCITY);
+                speeds = new ChassisSpeeds(0, 0, (voltage.magnitude() / 16.0) * Constants.MAX_ANGULAR_VELOCITY);
             }, log -> {
                 log.motor("Chassis")
-                    .voltage(modules[0].steerVoltage())
-                    .angularPosition(pigeon2.getYaw().getValue())
-                    .angularVelocity(pigeon2.getAngularVelocityYWorld().getValue());
+                        .voltage(modules[0].steerVoltage())
+                        .angularPosition(pigeon2.getYaw().getValue())
+                        .angularVelocity(pigeon2.getAngularVelocityYWorld().getValue());
             }, this));
 
     public double getRoll() {
@@ -241,19 +254,40 @@ public class Swerve extends SubsystemBase {
             mod.stop();
     }
 
-    public Pose2d estimatePose() {
+    public void estimatePose() {
         estimator.update(rotation(), modulePositions());
-        LimelightHelpers.SetRobotOrientation("limelight-main", 0, 0,0,0,0,0);
-        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-main");
-        
-        
-        if (mt2 == null) return new Pose2d();
-        else if (!(Math.abs(pigeon2.getAngularVelocityXWorld().getValueAsDouble()) > 720|| mt2.tagCount == 0)){
-            estimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
-            estimator.addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
-            estimatedPosePublisher.set(estimator.getEstimatedPosition());
+        LimelightHelpers.SetRobotOrientation("limelight-main", pigeon2.getYaw().getValueAsDouble(), 0,
+                pigeon2.getPitch().getValueAsDouble(), 0, pigeon2.getRoll().getValueAsDouble(), 0);
+        LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-main");
+        boolean doRejectUpdate = false;
+
+        if (mt1.tagCount == 1 && mt1.rawFiducials.length == 1) {
+            if (mt1.rawFiducials[0].ambiguity > .30) {
+                doRejectUpdate = true;
+            }
+            if (mt1.rawFiducials[0].distToCamera > 3) {
+                doRejectUpdate = true;
+            }
         }
-        return mt2.pose;
+        if (mt1.tagCount == 0) {
+            doRejectUpdate = true;
+        }
+
+        if (!doRejectUpdate) {
+            estimator.setVisionMeasurementStdDevs(VecBuilder.fill(.05, .07, 0.5));
+            estimator.addVisionMeasurement(
+                    mt1.pose,
+                    mt1.timestampSeconds);
+            estimatedPublisher.set(estimator.getEstimatedPosition());
+        }
+    }
+
+    public Pose2d getEstimatedPose() {
+        return estimator.getEstimatedPosition();
+    }
+
+    public double getEstimatedRotation(){
+        return getEstimatedPose().getRotation().getDegrees();
     }
 
     public void periodic() {
@@ -267,17 +301,30 @@ public class Swerve extends SubsystemBase {
         Pose2d pose = odometry.update(rotation(), modulePositions());
         estimatePose();
         posePublisher.set(pose);
+        estimatedPublisher.set(estimator.getEstimatedPosition());
+
+        SmartDashboard.putNumber("Timer", timer.get());
+
+        if ((int) (timer.get()) % 10 == 0) {
+            syncEncoders();
+        }
 
         SmartDashboard.putNumber("X position", pose.getX());
         SmartDashboard.putNumber("Y position", pose.getY());
+        SmartDashboard.putNumber("Estimated Rotation", getEstimatedRotation());
 
         SmartDashboard.putNumber("Odometry rotation", rotation().getDegrees());
-        SmartDashboard.putNumber("Pigeon Yaw", pigeon2.getYaw().getValueAsDouble());
+        SmartDashboard.putNumber("Pigeon Yaw", getYaw());
         SmartDashboard.putNumber("Pigeon Pitch",
-        pigeon2.getPitch().getValueAsDouble());
+                pigeon2.getPitch().getValueAsDouble());
         SmartDashboard.putNumber("Pigeon Roll",
-        pigeon2.getRoll().getValueAsDouble());
+                pigeon2.getRoll().getValueAsDouble());
 
         SmartDashboard.putString("Drive Mode", (field_oritented) ? "Field-Oriented" : "Robot-Oriented");
+
+        if (targetRotation != null)
+            SmartDashboard.putNumber("Target Rotation", targetRotation * 360);
+        else
+            SmartDashboard.putNumber("Target Rotation", 0.0);
     }
 }

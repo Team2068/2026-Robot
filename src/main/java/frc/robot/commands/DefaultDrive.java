@@ -18,21 +18,22 @@ public class DefaultDrive extends Command {
     private final DoubleSupplier rotation_supplier;
 
     public DefaultDrive(IO io, ChassisSpeeds chassisSpeeds) {
-        this(io, () -> chassisSpeeds.vxMetersPerSecond, () -> chassisSpeeds.vyMetersPerSecond, () -> chassisSpeeds.omegaRadiansPerSecond);
+        this(io, () -> chassisSpeeds.vxMetersPerSecond, () -> chassisSpeeds.vyMetersPerSecond,
+                () -> chassisSpeeds.omegaRadiansPerSecond);
     }
 
     public DefaultDrive(IO io, CommandXboxController controller) {
         this(io, () -> -modifyAxis(controller.getLeftY()) * Swerve.Constants.MAX_VELOCITY,
-        () -> -modifyAxis(controller.getLeftX()) * Swerve.Constants.MAX_VELOCITY,
-        () -> -modifyAxis(controller.getRightX()) * Swerve.Constants.MAX_ANGULAR_VELOCITY);
+                () -> -modifyAxis(controller.getLeftX()) * Swerve.Constants.MAX_VELOCITY,
+                () -> -modifyAxis(controller.getRightX()) * Swerve.Constants.MAX_ANGULAR_VELOCITY);
         this.controller = controller;
     }
-  
+
     public DefaultDrive(IO io,
-        DoubleSupplier translationXSupplier,
-        DoubleSupplier translationYSupplier,
-        DoubleSupplier rotationSupplier) {
-        
+            DoubleSupplier translationXSupplier,
+            DoubleSupplier translationYSupplier,
+            DoubleSupplier rotationSupplier) {
+
         this.io = io;
         this.x_supplier = translationXSupplier;
         this.y_supplier = translationYSupplier;
@@ -40,7 +41,7 @@ public class DefaultDrive extends Command {
 
         addRequirements(io.chassis);
     }
-    
+
     @Override
     public void execute() {
         double down_scale = 1.25 - modifyAxis(controller.getLeftTriggerAxis());
@@ -51,10 +52,17 @@ public class DefaultDrive extends Command {
 
         double xSpeed = x_supplier.getAsDouble() * scale;
         double ySpeed = y_supplier.getAsDouble() * scale;
-        double rotationSpeed = rotation_supplier.getAsDouble() * down_scale * rot_scale;
+
+        double rotationSpeed;
+
+        if (io.chassis.targetRotation != null) {
+            rotationSpeed = io.chassis.targetRotation;
+        } else {
+            rotationSpeed = rotation_supplier.getAsDouble() * down_scale * rot_scale;
+        }
 
         ChassisSpeeds output = new ChassisSpeeds(xSpeed, ySpeed, rotationSpeed);
-    
+
         if (io.chassis.field_oritented)
             output = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotationSpeed, io.chassis.rotation());
 
@@ -67,7 +75,8 @@ public class DefaultDrive extends Command {
     }
 
     private static double deadband(double value, double deadband) {
-        if (Math.abs(value) <= deadband) return 0.0;
+        if (Math.abs(value) <= deadband)
+            return 0.0;
         deadband *= (value > 0.0) ? 1 : -1;
         return (value + deadband) / (1.0 + deadband);
     }

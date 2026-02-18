@@ -7,6 +7,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.commands.Aimbot;
+import frc.robot.commands.DistanceShoot;
+import frc.robot.subsystems.Swerve.swerveState;
 
 public class AutomatedController {
     public final CommandXboxController controller;
@@ -73,10 +76,19 @@ public class AutomatedController {
 
     public void configureManual(){
         controller.back().and(manual()).onTrue(Util.Do(io.chassis::resetOdometry, io.chassis));
-        
-        controller.povDown().and( manual() ).onTrue(Util.Do(io.chassis::toggle));
-        controller.povLeft().and( manual() ).onTrue(Util.Do(io.chassis::syncEncoders));
-        controller.povRight().and( manual() ).and(() -> {return !io.chassis.active;}).onTrue(new InstantCommand(io.chassis::zeroAbsolute));
+
+        // AIMBOT
+        controller.a().and( manual()).onTrue(new Aimbot(io, swerveState.SCORING));
+        controller.b().and( manual()).onTrue(Util.Do(()-> io.chassis.currentState = swerveState.DEFAULT));
+
+        // SHOOTING (Currently set to manual mode)
+        controller.rightTrigger().and( manual()).onTrue(new DistanceShoot(io, new DistanceShootUtil(2, 0, 6000)));
+
+        // INTAKE
+        controller.y().and( manual()).onTrue(Util.Do(io.intake::intake));
+        controller.x().and( manual()).onTrue(Util.Do(()-> io.intake.speed(1))).onFalse(Util.Do(io.intake::stop));
+
+
     }
 
     void configureCharacterisaton(){
@@ -93,6 +105,18 @@ public class AutomatedController {
 
     void configureDebug(){
         controller.back().and(debug()).onTrue(Util.Do(io.chassis::resetOdometry, io.chassis));
+
+        controller.povDown().and( debug() ).onTrue(Util.Do(io.chassis::toggle));
+        controller.povLeft().and( debug() ).onTrue(Util.Do(io.chassis::syncEncoders));
+        controller.povRight().and( debug() ).and(() -> {return !io.chassis.active;}).onTrue(new InstantCommand(io.chassis::zeroAbsolute));
+
+        controller.a().and( debug()).onTrue(Util.Do(()-> io.flywheel.hoodAngle(-0.5)));
+        controller.b().and( debug()).onTrue(Util.Do(io.flywheel::stopHood));
+
+        controller.leftBumper().and( debug()).onTrue(Util.Do(() -> io.flywheel.hoodSpeed(0.1))).onFalse(Util.Do(io.flywheel::stopHood));
+        controller.rightBumper().and( debug()).onTrue(Util.Do(() -> io.flywheel.hoodSpeed(-0.1))).onFalse(Util.Do(io.flywheel::stopHood));
+        controller.rightTrigger().and( debug()).onTrue(Util.Do(() -> io.flywheel.flywheelSpeed(1))).onFalse(Util.Do(io.flywheel::stopFlywheel));
+        controller.leftTrigger().and( debug()).onTrue(Util.Do(() -> io.feeder.speed(.35))).onFalse(Util.Do(io.feeder::stop));
     }
 
 }
