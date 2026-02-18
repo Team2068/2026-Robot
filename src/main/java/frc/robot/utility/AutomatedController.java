@@ -72,6 +72,19 @@ public class AutomatedController {
 
     void configureAutomated(){
         controller.back().onTrue(Util.Do(io.chassis::resetAngle, io.chassis));
+
+        controller.back().and(manual()).onTrue(Util.Do(io.chassis::resetOdometry, io.chassis));
+
+        // AIMBOT
+        controller.a().and( manual()).onTrue(new Aimbot(io, swerveState.SCORING));
+        controller.b().and( manual()).onTrue(Util.Do(()-> io.chassis.currentState = swerveState.DEFAULT));
+
+        // SHOOTING
+        controller.rightTrigger().and( manual()).onTrue(new DistanceShoot(io));
+
+        // INTAKE
+        controller.y().and( manual()).onTrue(Util.Do(io.intake::intake));
+        controller.povUp().and( manual()).onTrue(Util.Do(()-> io.intake.speed(1))).onFalse(Util.Do(io.intake::stop));
     }
 
     public void configureManual(){
