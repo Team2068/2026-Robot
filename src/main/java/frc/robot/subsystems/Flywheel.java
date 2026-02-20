@@ -11,6 +11,7 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import frc.robot.utility.Util;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -42,13 +43,15 @@ public class Flywheel extends SubsystemBase {
 
     hoodConfig = new SparkMaxConfig();
     hoodConfig.idleMode(IdleMode.kBrake);
-    hoodConfig.closedLoop.pid(0.2, 0, 0);
+    hoodConfig.closedLoop.pid(0.05, 0, 0);
     hoodConfig.smartCurrentLimit(40);
+    hoodConfig.encoder.positionConversionFactor(360/14);
+    hoodConfig.encoder.velocityConversionFactor(360/14);
     // TODO find soft limits
-    hoodConfig.softLimit.reverseSoftLimitEnabled(false);
-    hoodConfig.softLimit.forwardSoftLimitEnabled(false);
-    hoodConfig.softLimit.forwardSoftLimit(1);
-    hoodConfig.softLimit.reverseSoftLimit(0);
+    hoodConfig.softLimit.reverseSoftLimitEnabled(true);
+    hoodConfig.softLimit.forwardSoftLimitEnabled(true);
+    hoodConfig.softLimit.forwardSoftLimit(55.6);
+    hoodConfig.softLimit.reverseSoftLimit(1);
     hood.configure(hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
@@ -83,6 +86,10 @@ public class Flywheel extends SubsystemBase {
 
   public double hoodAngle() {
     return hood.getEncoder().getPosition();
+  }
+
+  public void resetEncoder(){
+    hood.getEncoder().setPosition(0.0);
   }
 
   public double RPM() {
