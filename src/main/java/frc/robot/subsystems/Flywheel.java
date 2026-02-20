@@ -11,7 +11,6 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import frc.robot.utility.Util;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -31,9 +30,10 @@ public class Flywheel extends SubsystemBase {
 
     config = new TalonFXConfiguration();
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    config.CurrentLimits.StatorCurrentLimit = 80;
+    // Old limits were 80 and 20, check the impact this has on shooting
+    config.CurrentLimits.StatorCurrentLimit = 100;
     config.CurrentLimits.StatorCurrentLimitEnable = true;
-    config.CurrentLimits.SupplyCurrentLimit = 20;
+    config.CurrentLimits.SupplyCurrentLimit = 40;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.Slot0.kP = 0.0;
     config.Slot0.kD = 0.0;
@@ -44,9 +44,10 @@ public class Flywheel extends SubsystemBase {
     hoodConfig = new SparkMaxConfig();
     hoodConfig.idleMode(IdleMode.kBrake);
     hoodConfig.closedLoop.pid(0.05, 0, 0);
+    hoodConfig.closedLoop.feedForward.kG(0.03);
     hoodConfig.smartCurrentLimit(40);
-    hoodConfig.encoder.positionConversionFactor(360/14);
-    hoodConfig.encoder.velocityConversionFactor(360/14);
+    hoodConfig.encoder.positionConversionFactor(360.0/7.0);
+    hoodConfig.encoder.velocityConversionFactor(360.0/7.0);
     // TODO find soft limits
     hoodConfig.softLimit.reverseSoftLimitEnabled(true);
     hoodConfig.softLimit.forwardSoftLimitEnabled(true);
