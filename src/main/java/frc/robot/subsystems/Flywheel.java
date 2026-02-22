@@ -13,6 +13,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -21,16 +22,17 @@ public class Flywheel extends SubsystemBase {
   public TalonFXConfiguration config;
   public SparkMaxConfig hoodConfig;
   public SparkMax hood;
+  public DutyCycleEncoder encoder = new DutyCycleEncoder(3);
+  public boolean encoderActive;
 
   public VelocityVoltage control = new VelocityVoltage(0);
 
   public Flywheel(int shooterId, int hoodId) {
-    flywheel = new TalonFX(shooterId, "rio");
+    flywheel = new TalonFX(shooterId, "Swerve");
     hood = new SparkMax(hoodId, MotorType.kBrushless);
 
     config = new TalonFXConfiguration();
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    // Old limits were 80 and 20, check the impact this has on shooting
     config.CurrentLimits.StatorCurrentLimit = 100;
     config.CurrentLimits.StatorCurrentLimitEnable = true;
     config.CurrentLimits.SupplyCurrentLimit = 40;
@@ -46,12 +48,12 @@ public class Flywheel extends SubsystemBase {
     hoodConfig.closedLoop.pid(0.05, 0, 0);
     hoodConfig.closedLoop.feedForward.kG(0.03);
     hoodConfig.smartCurrentLimit(40);
-    hoodConfig.encoder.positionConversionFactor(360.0/7.0);
-    hoodConfig.encoder.velocityConversionFactor(360.0/7.0);
+    hoodConfig.encoder.positionConversionFactor(360.0/11.9);
+    hoodConfig.encoder.velocityConversionFactor(360.0/11.9);
     // TODO find soft limits
     hoodConfig.softLimit.reverseSoftLimitEnabled(true);
     hoodConfig.softLimit.forwardSoftLimitEnabled(true);
-    hoodConfig.softLimit.forwardSoftLimit(55.6);
+    hoodConfig.softLimit.forwardSoftLimit(50);
     hoodConfig.softLimit.reverseSoftLimit(1);
     hood.configure(hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
@@ -93,13 +95,27 @@ public class Flywheel extends SubsystemBase {
     hood.getEncoder().setPosition(0.0);
   }
 
+  public void syncEncoder(){
+    if(encoderActive)
+      hood.getEncoder().setPosition(encoder.get());
+  }
+
+  public double absolutePosition(){
+    return encoder.get() * (360 / 1.7);
+  }
+
   public double RPM() {
     return flywheel.getVelocity().getValueAsDouble() * 60;
   }
 
   @Override
   public void periodic() {
+    encoderActive = encoder.isConnected();
+    syncEncoder();
+
     SmartDashboard.putNumber("Hood Angle", hoodAngle());
+    SmartDashboard.putNumber("Hood Absolute Angle", hoodAngle());
     SmartDashboard.putNumber("Shooter RPM", RPM());
+    SmartDashboard.putBoolean("Encoder Connected", encoderActive);
   }
 }

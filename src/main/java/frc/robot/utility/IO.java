@@ -9,6 +9,7 @@ public class IO extends SubsystemBase {
         public final Intake intake = new Intake(15);
         public final Flywheel flywheel = new Flywheel(16, 18);
         public final Feeder feeder = new Feeder(17, 0);
+        public final PhotonVision vision = new PhotonVision();
 
         public IO() {
            DriverStation.silenceJoystickConnectionWarning(true);

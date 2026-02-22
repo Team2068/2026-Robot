@@ -7,10 +7,12 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.reduxrobotics.canand.CanandEventLoop;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.Publisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -32,6 +34,10 @@ public class RobotContainer {
   private final SendableChooser<Command> auto_selector;
   Command current_auto = new PrintCommand("");
   final SendableChooser<Integer> driver_selector = new SendableChooser<Integer>();
+
+  
+
+  
 
   public RobotContainer() {
     main = new AutomatedController(0, io);
