@@ -8,11 +8,11 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.reduxrobotics.canand.CanandEventLoop;
 
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.Publisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,18 +28,19 @@ public class RobotContainer {
   public final AutomatedController main;
   public static final Translation2d BLUE_HUB = new Translation2d(4.612, 4.030);
   public static final Translation2d RED_HUB = new Translation2d(11.917, 4.030);
-      StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault().getTable("Debug")
-            .getStructTopic("Blue Hub Pose", Pose2d.struct).publish();
+  StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault().getTable("Debug")
+      .getStructTopic("Blue Hub Pose", Pose2d.struct).publish();
 
   private final SendableChooser<Command> auto_selector;
   Command current_auto = new PrintCommand("");
   final SendableChooser<Integer> driver_selector = new SendableChooser<Integer>();
 
-  
-
-  
+  HttpCamera camera = new HttpCamera("Limelight", "limelight-main:5800");
 
   public RobotContainer() {
+    // For now have the limelight for drivers unless we get the PhotonVision cameras setup
+    CameraServer.startAutomaticCapture(camera);
+
     main = new AutomatedController(0, io);
     CanandEventLoop.getInstance();
 
@@ -61,7 +62,8 @@ public class RobotContainer {
   }
 
   public void configureAuton() {
-    // NamedCommands.registerCommand("Aimbot", new Aimbot(io, swerveState.SCORING, true));
+    // NamedCommands.registerCommand("Aimbot", new Aimbot(io, swerveState.SCORING,
+    // true));
     // NamedCommands.registerCommand("DistanceShoot", new DistanceShoot(io));
   }
 

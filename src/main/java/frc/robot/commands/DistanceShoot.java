@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.Swerve.swerveState;
 import frc.robot.utility.DistanceShootUtil;
 import frc.robot.utility.IO;
 
@@ -43,12 +44,18 @@ public class DistanceShoot extends Command {
   public void execute() {
     DistanceShootUtil helper;
 
-    if (distanceUtil == null) {
-      Translation2d hub = blue ? RobotContainer.BLUE_HUB : RobotContainer.RED_HUB;
-      Translation2d diff = hub.minus(io.chassis.pose().getTranslation());
-      helper = calculateFlywheel(Math.hypot(diff.getY(), diff.getX()));
-    } else {
-      helper = distanceUtil;
+    if (io.chassis.currentState != swerveState.PASSING) {
+      if (distanceUtil == null) {
+        Translation2d hub = blue ? RobotContainer.BLUE_HUB : RobotContainer.RED_HUB;
+        Translation2d diff = hub.minus(io.chassis.pose().getTranslation());
+        helper = calculateFlywheel(Math.hypot(diff.getY(), diff.getX()));
+      } else {
+        helper = distanceUtil;
+      }
+    }
+    else{
+      // TODO Find optimal values for passing from mid field
+      helper = new DistanceShootUtil(0, 6000);
     }
 
     io.flywheel.hoodAngle(helper.hoodAngle);
@@ -90,7 +97,8 @@ public class DistanceShoot extends Command {
 
   @Override
   public boolean isFinished() {
-    // TODO find actual time or if we get the servo attached change to servo code or just have it be a trigger you hold down
+    // TODO find actual time or if we get the servo attached change to servo code or
+    // just have it be a trigger you hold down
     return timer.get() > 10;
   }
 }

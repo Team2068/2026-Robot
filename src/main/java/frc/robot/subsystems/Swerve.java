@@ -326,5 +326,7 @@ public class Swerve extends SubsystemBase {
             SmartDashboard.putNumber("Target Rotation", targetRotation * 360);
         else
             SmartDashboard.putNumber("Target Rotation", 0.0);
+
+        SmartDashboard.putString("Robot State", currentState.toString());
     }
 }
