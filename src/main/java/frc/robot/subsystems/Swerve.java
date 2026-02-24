@@ -54,8 +54,11 @@ public class Swerve extends SubsystemBase {
             .getStructTopic("Current pose", Pose2d.struct).publish();
     StructPublisher<Pose2d> estimatedPublisher = NetworkTableInstance.getDefault().getTable("Debug")
             .getStructTopic("Estimated pose", Pose2d.struct).publish();
+        StructPublisher<Pose2d> estimatedPublisherWithYaw = NetworkTableInstance.getDefault().getTable("Debug")
+            .getStructTopic("Estimated pose", Pose2d.struct).publish();
 
     SwerveDrivePoseEstimator estimator;
+    SwerveDrivePoseEstimator estimatorWithYaw;
 
     final SwerveDriveOdometry odometry;
     final Module[] modules = new Module[4];
@@ -96,9 +99,10 @@ public class Swerve extends SubsystemBase {
                 new Pose2d(0, 0, new Rotation2d()));
 
         estimator = new SwerveDrivePoseEstimator(kinematics, rotation(), modulePositions(), odometry.getPoseMeters());
+        estimatorWithYaw = new SwerveDrivePoseEstimator(kinematics, rotation(), modulePositions(), odometry.getPoseMeters());
 
         AutoBuilder.configure(
-                this::pose,
+                this::getEstimatedPose, // See how using pose estimation affects auton.
                 this::resetOdometry,
                 this::getSpeeds,
                 (speeds, feedforwards) -> drive(speeds),
@@ -256,6 +260,7 @@ public class Swerve extends SubsystemBase {
 
     public void estimatePose() {
         estimator.update(rotation(), modulePositions());
+        estimatorWithYaw.update(rotation(), modulePositions());
         LimelightHelpers.SetRobotOrientation("limelight-main", pigeon2.getYaw().getValueAsDouble(), 0,
                 pigeon2.getPitch().getValueAsDouble(), 0, pigeon2.getRoll().getValueAsDouble(), 0);
         LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-main");
@@ -274,11 +279,17 @@ public class Swerve extends SubsystemBase {
         }
 
         if (!doRejectUpdate) {
-            estimator.setVisionMeasurementStdDevs(VecBuilder.fill(.05, .07, 0.5));
+            estimator.setVisionMeasurementStdDevs(VecBuilder.fill(.05, .07, 9999999));
+            estimatorWithYaw.setVisionMeasurementStdDevs(VecBuilder.fill(.05, .07, 0.5));
             estimator.addVisionMeasurement(
                     mt1.pose,
                     mt1.timestampSeconds);
             estimatedPublisher.set(estimator.getEstimatedPosition());
+
+            estimatorWithYaw.addVisionMeasurement(
+                    mt1.pose,
+                    mt1.timestampSeconds);
+            estimatedPublisherWithYaw.set(estimatorWithYaw.getEstimatedPosition());
         }
     }
 
@@ -286,8 +297,12 @@ public class Swerve extends SubsystemBase {
         return estimator.getEstimatedPosition();
     }
 
+    public Pose2d getEstimatedPoseWithYaw() {
+        return estimatorWithYaw.getEstimatedPosition();
+    }
+
     public double getEstimatedRotation(){
-        return getEstimatedPose().getRotation().getDegrees();
+        return getEstimatedPoseWithYaw().getRotation().getDegrees();
     }
 
     public void periodic() {
@@ -302,6 +317,7 @@ public class Swerve extends SubsystemBase {
         estimatePose();
         posePublisher.set(pose);
         estimatedPublisher.set(estimator.getEstimatedPosition());
+        estimatedPublisherWithYaw.set(estimatorWithYaw.getEstimatedPosition());
 
         SmartDashboard.putNumber("Timer", timer.get());
 
