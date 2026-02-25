@@ -87,8 +87,6 @@ public class AutomatedController {
         // INTAKE
         controller.y().and( manual()).onTrue(Util.Do(io.intake::intake));
         controller.x().and( manual()).onTrue(Util.Do(()-> io.intake.speed(1))).onFalse(Util.Do(io.intake::stop));
-
-
     }
 
     void configureCharacterisaton(){
@@ -110,13 +108,15 @@ public class AutomatedController {
         controller.povLeft().and( debug() ).onTrue(Util.Do(io.chassis::syncEncoders));
         controller.povRight().and( debug() ).and(() -> {return !io.chassis.active;}).onTrue(new InstantCommand(io.chassis::zeroAbsolute));
 
-        controller.a().and( debug()).onTrue(Util.Do(()-> io.flywheel.hoodAngle(20)));
+        controller.a().and( debug()).onTrue(Util.Do(()-> io.flywheel.hoodAngle(6.5)));
         controller.b().and( debug()).onTrue(Util.Do(io.flywheel::stopHood));
         controller.y().and( debug()).onTrue(Util.Do(io.flywheel::resetEncoder));
+        // controller.x().and( debug()).onTrue(Util.Do(()-> io.flywheel.RPM(4500)));
+        controller.x().and( debug()).onTrue(new DistanceShoot(io, new DistanceShootUtil(16, 4400)));
 
-        controller.leftBumper().and( debug()).onTrue(Util.Do(() -> io.flywheel.hoodSpeed(0.05))).onFalse(Util.Do(io.flywheel::stopHood));
-        controller.rightBumper().and( debug()).onTrue(Util.Do(() -> io.flywheel.hoodSpeed(-0.05))).onFalse(Util.Do(io.flywheel::stopHood));
-        controller.rightTrigger().and( debug()).onTrue(Util.Do(() -> io.flywheel.flywheelSpeed(1))).onFalse(Util.Do(io.flywheel::stopFlywheel));
+        controller.leftBumper().and( debug()).onTrue(Util.Do(() -> io.flywheel.hoodSpeed(0.1))).onFalse(Util.Do(io.flywheel::stopHood));
+        controller.rightBumper().and( debug()).onTrue(Util.Do(() -> io.flywheel.hoodSpeed(-0.1))).onFalse(Util.Do(io.flywheel::stopHood));
+        controller.rightTrigger().and( debug()).onTrue(Util.Do(() -> io.flywheel.flywheelSpeed(.90))).onFalse(Util.Do(io.flywheel::stopFlywheel));
         controller.leftTrigger().and( debug()).onTrue(Util.Do(() -> io.feeder.speed(.75))).onFalse(Util.Do(io.feeder::stop));
     }
 

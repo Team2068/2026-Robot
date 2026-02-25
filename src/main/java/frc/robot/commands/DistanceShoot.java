@@ -14,7 +14,8 @@ import frc.robot.utility.IO;
 public class DistanceShoot extends Command {
   IO io;
   boolean blue;
-  private static final int RPM_TOLERANCE = 50;
+  // TODO tune shooter pid so tolerance can be lower
+  private static final int RPM_TOLERANCE = 200;
   private static final double ANGLE_TOLERANCE = 1.5;
   
   Timer timer = new Timer();
@@ -39,6 +40,7 @@ public class DistanceShoot extends Command {
   public void initialize() {
     blue = DriverStation.getAlliance().get() == Alliance.Blue;
     timer.start();
+    timer.restart();
   }
 
   @Override
@@ -63,7 +65,7 @@ public class DistanceShoot extends Command {
 
     if (Math.abs(io.flywheel.RPM() - helper.shooterRPM) < RPM_TOLERANCE
         && Math.abs(io.flywheel.hoodAngle() - helper.hoodAngle) < ANGLE_TOLERANCE) {
-      io.feeder.speed(1);
+      io.feeder.speed(.75);
     }
   }
 

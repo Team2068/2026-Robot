@@ -22,7 +22,7 @@ public class Flywheel extends SubsystemBase {
   public TalonFXConfiguration config;
   public SparkMaxConfig hoodConfig;
   public SparkMax hood;
-  public DutyCycleEncoder encoder = new DutyCycleEncoder(3);
+  public DutyCycleEncoder encoder = new DutyCycleEncoder(2);
   public boolean encoderActive;
 
   public VelocityVoltage control = new VelocityVoltage(0);
@@ -37,7 +37,7 @@ public class Flywheel extends SubsystemBase {
     config.CurrentLimits.StatorCurrentLimitEnable = true;
     config.CurrentLimits.SupplyCurrentLimit = 40;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
-    config.Slot0.kP = 0.0;
+    config.Slot0.kP = 4.0;
     config.Slot0.kD = 0.0;
     config.Slot0.kV = 0.0;
 
@@ -51,8 +51,8 @@ public class Flywheel extends SubsystemBase {
     hoodConfig.encoder.positionConversionFactor(360.0/11.9);
     hoodConfig.encoder.velocityConversionFactor(360.0/11.9);
     // TODO find soft limits
-    hoodConfig.softLimit.reverseSoftLimitEnabled(true);
-    hoodConfig.softLimit.forwardSoftLimitEnabled(true);
+    hoodConfig.softLimit.reverseSoftLimitEnabled(false);
+    hoodConfig.softLimit.forwardSoftLimitEnabled(false);
     hoodConfig.softLimit.forwardSoftLimit(50);
     hoodConfig.softLimit.reverseSoftLimit(1);
     hood.configure(hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -111,10 +111,10 @@ public class Flywheel extends SubsystemBase {
   @Override
   public void periodic() {
     encoderActive = encoder.isConnected();
-    syncEncoder();
+    // syncEncoder();
 
     SmartDashboard.putNumber("Hood Angle", hoodAngle());
-    SmartDashboard.putNumber("Hood Absolute Angle", hoodAngle());
+    SmartDashboard.putNumber("Hood Absolute Angle", absolutePosition());
     SmartDashboard.putNumber("Shooter RPM", RPM());
     SmartDashboard.putBoolean("Encoder Connected", encoderActive);
   }
