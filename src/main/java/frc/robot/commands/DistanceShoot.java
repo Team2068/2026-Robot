@@ -16,10 +16,11 @@ public class DistanceShoot extends Command {
   boolean blue;
   private static final int RPM_TOLERANCE = 50;
   private static final double ANGLE_TOLERANCE = 1.5;
-
+  
   Timer timer = new Timer();
 
-  DistanceShootUtil[] data = { new DistanceShootUtil(0, 0, 0) };
+  DistanceShootUtil[] data = { new DistanceShootUtil(0, 7, 4400), new DistanceShootUtil(0.9144, 5, 4800),
+      new DistanceShootUtil(1.8288, 15, 5450), new DistanceShootUtil(2.7432, 17, 5800) };
 
   DistanceShootUtil distanceUtil = null;
 
@@ -52,8 +53,7 @@ public class DistanceShoot extends Command {
       } else {
         helper = distanceUtil;
       }
-    }
-    else{
+    } else {
       // TODO Find optimal values for passing from mid field
       helper = new DistanceShootUtil(0, 6000);
     }
