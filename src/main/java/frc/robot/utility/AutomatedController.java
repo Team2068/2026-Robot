@@ -112,12 +112,14 @@ public class AutomatedController {
         controller.b().and( debug()).onTrue(Util.Do(io.flywheel::stopHood));
         controller.y().and( debug()).onTrue(Util.Do(io.flywheel::resetEncoder));
         // controller.x().and( debug()).onTrue(Util.Do(()-> io.flywheel.RPM(4500)));
-        controller.x().and( debug()).onTrue(new DistanceShoot(io, new DistanceShootUtil(16, 4400)));
+        controller.x().and( debug()).onTrue(new DistanceShoot(io, new DistanceShootUtil(25, 5250)));
 
         controller.leftBumper().and( debug()).onTrue(Util.Do(() -> io.flywheel.hoodSpeed(0.1))).onFalse(Util.Do(io.flywheel::stopHood));
         controller.rightBumper().and( debug()).onTrue(Util.Do(() -> io.flywheel.hoodSpeed(-0.1))).onFalse(Util.Do(io.flywheel::stopHood));
-        controller.rightTrigger().and( debug()).onTrue(Util.Do(() -> io.flywheel.flywheelSpeed(.90))).onFalse(Util.Do(io.flywheel::stopFlywheel));
-        controller.leftTrigger().and( debug()).onTrue(Util.Do(() -> io.feeder.speed(.75))).onFalse(Util.Do(io.feeder::stop));
+        controller.rightTrigger().and( debug()).onTrue(Util.Do(() -> io.flywheel.flywheelSpeed(1))).onFalse(Util.Do(io.flywheel::stopFlywheel));
+        // controller.leftTrigger().and( debug()).onTrue(Util.Do(() -> io.feeder.speed(.75))).onFalse(Util.Do(io.feeder::stop));
+        controller.leftTrigger().and( debug()).onTrue(Util.Do(() -> io.feeder.voltLoop(7.2)));
+        controller.povUp().and( debug()).onTrue(Util.Do(io.feeder::stop));
     }
 
 }

@@ -4,6 +4,7 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
@@ -22,6 +23,7 @@ public class Feeder extends SubsystemBase {
     
     config.idleMode(IdleMode.kBrake);
     config.smartCurrentLimit(20);
+    config.closedLoop.pid(0.004, 0, 0.05);
     feeder.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
@@ -41,8 +43,13 @@ public class Feeder extends SubsystemBase {
     return beambreak.get();
   }
 
+  public void voltLoop(double volts){
+    feeder.getClosedLoopController().setSetpoint(volts, ControlType.kVoltage);
+  }
+
   @Override
   public void periodic() {
     SmartDashboard.putBoolean("Supplied", supplied());
+    SmartDashboard.putNumber("Feeder RPM", feeder.getEncoder().getVelocity());
   }
 }

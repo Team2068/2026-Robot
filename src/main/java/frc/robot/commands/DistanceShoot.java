@@ -15,7 +15,7 @@ public class DistanceShoot extends Command {
   IO io;
   boolean blue;
   // TODO tune shooter pid so tolerance can be lower
-  private static final int RPM_TOLERANCE = 200;
+  private static final int RPM_TOLERANCE = 100;
   private static final double ANGLE_TOLERANCE = 1.5;
   
   Timer timer = new Timer();
@@ -65,7 +65,7 @@ public class DistanceShoot extends Command {
 
     if (Math.abs(io.flywheel.RPM() - helper.shooterRPM) < RPM_TOLERANCE
         && Math.abs(io.flywheel.hoodAngle() - helper.hoodAngle) < ANGLE_TOLERANCE) {
-      io.feeder.speed(.75);
+      io.feeder.voltLoop(7.2);
     }
   }
 

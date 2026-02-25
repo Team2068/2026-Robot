@@ -37,9 +37,9 @@ public class Flywheel extends SubsystemBase {
     config.CurrentLimits.StatorCurrentLimitEnable = true;
     config.CurrentLimits.SupplyCurrentLimit = 40;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
-    config.Slot0.kP = 4.0;
+    config.Slot0.kP = 1.0;
     config.Slot0.kD = 0.0;
-    config.Slot0.kV = 0.0;
+    config.Slot0.kV = 0.118;
 
     flywheel.getConfigurator().apply(config);
 
