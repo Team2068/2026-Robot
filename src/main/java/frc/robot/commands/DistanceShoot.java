@@ -16,9 +16,9 @@ public class DistanceShoot extends Command {
   IO io;
   boolean blue;
   // TODO tune shooter pid so tolerance can be lower
-  private static final int RPM_TOLERANCE = 250;
+  private static final int RPM_TOLERANCE = 120;
   private static final double ANGLE_TOLERANCE = 1.5;
-  
+
   Timer timer = new Timer();
 
   DistanceShootUtil[] data = { new DistanceShootUtil(0, 7, 4400), new DistanceShootUtil(0.9144, 5, 4800),
@@ -51,9 +51,8 @@ public class DistanceShoot extends Command {
     if (io.chassis.currentState != swerveState.PASSING) {
       if (distanceUtil == null) {
         Translation2d hub = blue ? RobotContainer.BLUE_HUB : RobotContainer.RED_HUB;
-        Translation2d diff = hub.minus(io.chassis.pose().getTranslation());
+        Translation2d diff = hub.minus(io.chassis.getEstimatedPose().getTranslation());
         helper = calculateFlywheel(Math.hypot(diff.getY(), diff.getX()));
-        SmartDashboard.putNumber("Distance To Hub", Math.hypot(diff.getY(), diff.getX()));
       } else {
         helper = distanceUtil;
       }

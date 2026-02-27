@@ -26,6 +26,7 @@ import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -38,6 +39,7 @@ import frc.robot.swerve.Module;
 import frc.robot.swerve.Swerve.Constants;
 import frc.robot.utility.LimelightHelpers;
 import frc.robot.utility.Util;
+import frc.robot.RobotContainer;
 
 public class Swerve extends SubsystemBase {
 
@@ -54,8 +56,8 @@ public class Swerve extends SubsystemBase {
             .getStructTopic("Current pose", Pose2d.struct).publish();
     StructPublisher<Pose2d> estimatedPublisher = NetworkTableInstance.getDefault().getTable("Debug")
             .getStructTopic("Estimated pose", Pose2d.struct).publish();
-        StructPublisher<Pose2d> estimatedPublisherWithYaw = NetworkTableInstance.getDefault().getTable("Debug")
-            .getStructTopic("Estimated pose", Pose2d.struct).publish();
+    StructPublisher<Pose2d> estimatedPublisherWithYaw = NetworkTableInstance.getDefault().getTable("Debug")
+            .getStructTopic("Estimated pose with yaw", Pose2d.struct).publish();
 
     SwerveDrivePoseEstimator estimator;
     SwerveDrivePoseEstimator estimatorWithYaw;
@@ -345,5 +347,10 @@ public class Swerve extends SubsystemBase {
             SmartDashboard.putNumber("Target Rotation", 0.0);
 
         SmartDashboard.putString("Robot State", currentState.toString());
+
+        boolean blue = DriverStation.getAlliance().get() == Alliance.Blue;
+        Translation2d hub = blue ? RobotContainer.BLUE_HUB : RobotContainer.RED_HUB;
+        Translation2d diff = hub.minus(getEstimatedPose().getTranslation());
+        SmartDashboard.putNumber("Distance To Hub", Math.hypot(diff.getY(), diff.getX()));
     }
 }

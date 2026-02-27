@@ -17,7 +17,7 @@ public class Aimbot extends Command {
   boolean blue;
   double target;
   boolean auton = false;
-  private static final double ANGLE_OFFSET = 0;
+  private static final double ANGLE_OFFSET = Math.toRadians(180);
 
   public Aimbot(IO io, swerveState state) {
     this.io = io;
@@ -48,7 +48,7 @@ public class Aimbot extends Command {
 
       SmartDashboard.putNumber("Target", Math.toDegrees(target));
 
-      if (Math.abs((Math.toRadians(io.chassis.getEstimatedRotation())) - target) < Math.toRadians(3)) {
+      if (Math.abs((Math.toRadians(io.chassis.getEstimatedRotation())) - target) < Math.toRadians(7)) {
         io.chassis.targetRotation = 0.0;
       } else {
         if (target - Math.toRadians(io.chassis.getEstimatedRotation()) > 0) {
