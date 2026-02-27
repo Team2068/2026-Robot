@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Swerve.swerveState;
@@ -52,6 +53,7 @@ public class DistanceShoot extends Command {
         Translation2d hub = blue ? RobotContainer.BLUE_HUB : RobotContainer.RED_HUB;
         Translation2d diff = hub.minus(io.chassis.pose().getTranslation());
         helper = calculateFlywheel(Math.hypot(diff.getY(), diff.getX()));
+        SmartDashboard.putNumber("Distance To Hub", Math.hypot(diff.getY(), diff.getX()));
       } else {
         helper = distanceUtil;
       }
@@ -99,8 +101,6 @@ public class DistanceShoot extends Command {
 
   @Override
   public boolean isFinished() {
-    // TODO find actual time or if we get the servo attached change to servo code or
-    // just have it be a trigger you hold down
-    return timer.get() > 10;
+    return false;
   }
 }

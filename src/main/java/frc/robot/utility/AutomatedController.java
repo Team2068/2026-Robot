@@ -72,6 +72,18 @@ public class AutomatedController {
 
     void configureAutomated(){
         controller.back().onTrue(Util.Do(io.chassis::resetAngle, io.chassis));
+
+        // INTAKE
+        controller.b().and(automated()).onTrue(Util.Do(io.intake::intake));
+
+        // FLYWHEEL
+        // TODO make sure the trigger shooting works
+        controller.rightTrigger().and(automated()).whileTrue(new DistanceShoot(io));
+
+        // STATE CONTROLLERS AND AIMBOT
+        controller.a().and(automated()).onTrue(new Aimbot(io, swerveState.SCORING));
+        controller.y().and(automated()).onTrue(new Aimbot(io, swerveState.DEFAULT));
+        controller.x().and(automated()).onTrue(Util.Do(()-> io.chassis.currentState = swerveState.PASSING));
     }
 
     public void configureManual(){
@@ -81,7 +93,7 @@ public class AutomatedController {
         controller.a().and( manual()).onTrue(new Aimbot(io, swerveState.SCORING));
         controller.b().and( manual()).onTrue(Util.Do(()-> io.chassis.currentState = swerveState.DEFAULT));
 
-        // SHOOTING (Currently set to manual mode)
+        // SHOOTING
         controller.rightTrigger().and( manual()).onTrue(new DistanceShoot(io, new DistanceShootUtil(2, 0, 6000)));
 
         // INTAKE

@@ -38,39 +38,35 @@ public class Aimbot extends Command {
     pid.enableContinuousInput(-Math.PI, Math.PI);
     pid.reset();
   }
-  
+
   @Override
   public void execute() {
-    // TODO Get all values
-    if (state == swerveState.PASSING) {
-      target = blue ? 0 : Math.PI;
-    } else if (state == swerveState.SCORING) {
+    if (state == swerveState.SCORING) {
       Translation2d hub = blue ? RobotContainer.BLUE_HUB : RobotContainer.RED_HUB;
       Translation2d diff = hub.minus(io.chassis.getEstimatedPose().getTranslation());
       target = Math.atan2(diff.getY(), diff.getX()) + Math.toRadians(ANGLE_OFFSET);
-    }
 
-    SmartDashboard.putNumber("Target", Math.toDegrees(target));
+      SmartDashboard.putNumber("Target", Math.toDegrees(target));
 
-    if(Math.abs((Math.toRadians(io.chassis.getEstimatedRotation())) - target) < Math.toRadians(3)){
-      io.chassis.targetRotation = 0.0;
-    }
-    else{
-      if(target - Math.toRadians(io.chassis.getEstimatedRotation()) > 0){
+      if (Math.abs((Math.toRadians(io.chassis.getEstimatedRotation())) - target) < Math.toRadians(3)) {
+        io.chassis.targetRotation = 0.0;
+      } else {
+        if (target - Math.toRadians(io.chassis.getEstimatedRotation()) > 0) {
           io.chassis.targetRotation = -0.025;
+        } else {
+          io.chassis.targetRotation = 0.025;
+        }
       }
-      else{
-        io.chassis.targetRotation = 0.025;
-      }
-    }
 
-    // TODO find out why PID loop isn't working
-    // if(pid.atSetpoint()){
-    //   io.chassis.targetRotation = 0.0;
-    // }
-    // else{
-    //   io.chassis.targetRotation = pid.calculate(Math.toRadians(io.chassis.getEstimatedRotation()), target);
-    // }
+      // TODO find out why PID loop isn't working
+      // if(pid.atSetpoint()){
+      // io.chassis.targetRotation = 0.0;
+      // }
+      // else{
+      // io.chassis.targetRotation =
+      // pid.calculate(Math.toRadians(io.chassis.getEstimatedRotation()), target);
+      // }
+    }
   }
 
   @Override
@@ -80,6 +76,7 @@ public class Aimbot extends Command {
 
   @Override
   public boolean isFinished() {
-    return auton ? (Math.abs((Math.toRadians(io.chassis.getEstimatedRotation())) - target) < Math.toRadians(3)) : (io.chassis.currentState != state);
+    return auton ? (Math.abs((Math.toRadians(io.chassis.getEstimatedRotation())) - target) < Math.toRadians(3))
+        : (io.chassis.currentState != state);
   }
 }
