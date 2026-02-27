@@ -35,7 +35,7 @@ public class RobotContainer {
   Command current_auto = new PrintCommand("");
   final SendableChooser<Integer> driver_selector = new SendableChooser<Integer>();
 
-  // HttpCamera camera = new HttpCamera("Limelight", "limelight-main:5800");
+  // HttpCamera camera = new HttpCamera("Limelight", "http://limelight-main.local:5800");
 
   public RobotContainer() {
     // For now have the limelight for drivers unless we get the PhotonVision cameras setup

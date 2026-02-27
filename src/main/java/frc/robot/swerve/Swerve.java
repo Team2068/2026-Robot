@@ -25,7 +25,7 @@ public class Swerve {
 
         public double TRACKWIDTH = 27; // 30.0 for MKi
         public double WHEELBASE = 27; // 30.0 for MKi
-        public double GEAR_RATIO = 8.14;
+        public double GEAR_RATIO = 8.14;    
         public double WHEEL_RADIUS = .1143;
 
         // DRIVER SETTINGS

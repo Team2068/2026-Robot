@@ -53,8 +53,8 @@ public class Flywheel extends SubsystemBase {
     // TODO find soft limits
     hoodConfig.softLimit.reverseSoftLimitEnabled(false);
     hoodConfig.softLimit.forwardSoftLimitEnabled(false);
-    hoodConfig.softLimit.forwardSoftLimit(50);
-    hoodConfig.softLimit.reverseSoftLimit(1);
+    hoodConfig.softLimit.forwardSoftLimit(66.5);
+    hoodConfig.softLimit.reverseSoftLimit(0);
     hood.configure(hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 

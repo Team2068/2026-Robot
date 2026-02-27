@@ -15,13 +15,13 @@ public class DistanceShoot extends Command {
   IO io;
   boolean blue;
   // TODO tune shooter pid so tolerance can be lower
-  private static final int RPM_TOLERANCE = 100;
+  private static final int RPM_TOLERANCE = 250;
   private static final double ANGLE_TOLERANCE = 1.5;
   
   Timer timer = new Timer();
 
   DistanceShootUtil[] data = { new DistanceShootUtil(0, 7, 4400), new DistanceShootUtil(0.9144, 5, 4800),
-      new DistanceShootUtil(1.8288, 15, 5450), new DistanceShootUtil(2.7432, 17, 5800) };
+      new DistanceShootUtil(1.8288, 15, 4200), new DistanceShootUtil(2.7432, 17, 5800) };
 
   DistanceShootUtil distanceUtil = null;
 
