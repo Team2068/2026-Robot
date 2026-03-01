@@ -131,7 +131,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public Rotation2d rotation() {
-        double rotation = pigeon2.getYaw().getValueAsDouble() % 360;
+        double rotation = (pigeon2.getYaw().getValueAsDouble() + 90) % 360;
         rotation += (rotation < 0) ? 360 : 0;
         return new Rotation2d(Degree.of(rotation));
     }
@@ -263,9 +263,11 @@ public class Swerve extends SubsystemBase {
     public void estimatePose() {
         estimator.update(rotation(), modulePositions());
         estimatorWithYaw.update(rotation(), modulePositions());
-        LimelightHelpers.SetRobotOrientation("limelight-main", pigeon2.getYaw().getValueAsDouble(), 0,
+        // TODO switch limelight back to main or combine both measurements
+        LimelightHelpers.SetRobotOrientation("limelight-intake", pigeon2.getYaw().getValueAsDouble(), 0,
                 pigeon2.getPitch().getValueAsDouble(), 0, pigeon2.getRoll().getValueAsDouble(), 0);
-        LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-main");
+        // TODO switch limelight back to main or combine both measurements
+        LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-intake");
         boolean doRejectUpdate = false;
 
         if (mt1.tagCount == 1 && mt1.rawFiducials.length == 1) {

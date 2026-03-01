@@ -9,12 +9,15 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Feeder extends SubsystemBase {
   public SparkMax feeder;
   public DigitalInput beambreak;
+  public Servo blocker = new Servo(9);
+  public boolean blocked = true;
   public SparkFlexConfig config = new SparkFlexConfig();
 
   public Feeder(int feederId, int beambreakId) {
@@ -43,6 +46,12 @@ public class Feeder extends SubsystemBase {
     return beambreak.get();
   }
 
+  public void block(){
+    // TODO Find actual values
+    blocked = !blocked;
+    blocker.setAngle(blocked ? 0 : 90);
+  }
+
   public void voltLoop(double volts){
     feeder.getClosedLoopController().setSetpoint(volts, ControlType.kVoltage);
   }
@@ -51,5 +60,6 @@ public class Feeder extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putBoolean("Supplied", supplied());
     SmartDashboard.putNumber("Feeder RPM", feeder.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Blocker Angle", blocker.getAngle());
   }
 }

@@ -21,8 +21,7 @@ public class DistanceShoot extends Command {
 
   Timer timer = new Timer();
 
-  DistanceShootUtil[] data = { new DistanceShootUtil(0, 7, 4400), new DistanceShootUtil(0.9144, 5, 4800),
-      new DistanceShootUtil(1.8288, 15, 4200), new DistanceShootUtil(2.7432, 17, 5800) };
+  DistanceShootUtil[] data = {new DistanceShootUtil(0, 2, 4400), new DistanceShootUtil(1.67, 4, 4500), new DistanceShootUtil(2.05, 6, 4600), new DistanceShootUtil(2.33, 8, 4600), new DistanceShootUtil(2.75, 16, 4900), new DistanceShootUtil(3.5, 19, 5200), new DistanceShootUtil(4.0, 21, 5400), new DistanceShootUtil(4.9, 28, 5900) };
 
   DistanceShootUtil distanceUtil = null;
 

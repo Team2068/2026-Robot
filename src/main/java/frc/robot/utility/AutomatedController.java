@@ -68,6 +68,7 @@ public class AutomatedController {
         configureManual();
         configureCharacterisaton();
         configureDebug();
+        
     }
 
     void configureAutomated(){
@@ -78,12 +79,13 @@ public class AutomatedController {
 
         // FLYWHEEL
         // TODO make sure the trigger shooting works
-        controller.rightTrigger().and(automated()).whileTrue(new DistanceShoot(io));
+        controller.rightTrigger().and(automated()).onTrue(new DistanceShoot(io));
 
         // STATE CONTROLLERS AND AIMBOT
         controller.a().and(automated()).onTrue(new Aimbot(io, swerveState.SCORING));
-        controller.y().and(automated()).onTrue(new Aimbot(io, swerveState.DEFAULT));
+        controller.y().and(automated()).onTrue(Util.Do(()-> io.chassis.currentState = swerveState.DEFAULT));
         controller.x().and(automated()).onTrue(Util.Do(()-> io.chassis.currentState = swerveState.PASSING));
+        controller.povDown().and(automated()).onTrue(Util.Do(()-> io.chassis.currentState = swerveState.SCORING));
     }
 
     public void configureManual(){
@@ -124,7 +126,7 @@ public class AutomatedController {
         controller.b().and( debug()).onTrue(Util.Do(io.flywheel::stopHood));
         controller.y().and( debug()).onTrue(Util.Do(io.flywheel::resetEncoder));
         // controller.x().and( debug()).onTrue(Util.Do(()-> io.flywheel.RPM(4500)));
-        controller.x().and( debug()).onTrue(new DistanceShoot(io, new DistanceShootUtil(21, 5400)));
+        controller.x().and( debug()).onTrue(new DistanceShoot(io, new DistanceShootUtil(28, 5900)));
 
         controller.leftBumper().and( debug()).onTrue(Util.Do(() -> io.flywheel.hoodSpeed(0.1))).onFalse(Util.Do(io.flywheel::stopHood));
         controller.rightBumper().and( debug()).onTrue(Util.Do(() -> io.flywheel.hoodSpeed(-0.1))).onFalse(Util.Do(io.flywheel::stopHood));
