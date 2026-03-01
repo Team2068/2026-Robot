@@ -260,14 +260,12 @@ public class Swerve extends SubsystemBase {
             mod.stop();
     }
 
-    public void estimatePose() {
+    public void estimatePose(String limelight) {
         estimator.update(rotation(), modulePositions());
         estimatorWithYaw.update(rotation(), modulePositions());
-        // TODO switch limelight back to main or combine both measurements
-        LimelightHelpers.SetRobotOrientation("limelight-intake", pigeon2.getYaw().getValueAsDouble(), 0,
+        LimelightHelpers.SetRobotOrientation(limelight, pigeon2.getYaw().getValueAsDouble(), 0,
                 pigeon2.getPitch().getValueAsDouble(), 0, pigeon2.getRoll().getValueAsDouble(), 0);
-        // TODO switch limelight back to main or combine both measurements
-        LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-intake");
+        LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight);
         boolean doRejectUpdate = false;
 
         if (mt1.tagCount == 1 && mt1.rawFiducials.length == 1) {
@@ -318,7 +316,7 @@ public class Swerve extends SubsystemBase {
         target_states.set(states);
 
         Pose2d pose = odometry.update(rotation(), modulePositions());
-        estimatePose();
+        estimatePose("limelight-main");
         posePublisher.set(pose);
         estimatedPublisher.set(estimator.getEstimatedPosition());
         estimatedPublisherWithYaw.set(estimatorWithYaw.getEstimatedPosition());
