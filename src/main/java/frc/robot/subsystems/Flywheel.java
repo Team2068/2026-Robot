@@ -22,7 +22,7 @@ public class Flywheel extends SubsystemBase {
   public TalonFXConfiguration config;
   public SparkMaxConfig hoodConfig;
   public SparkMax hood;
-  public DutyCycleEncoder encoder = new DutyCycleEncoder(2);
+  public DutyCycleEncoder encoder = new DutyCycleEncoder(3);
   public boolean encoderActive;
 
   public VelocityVoltage control = new VelocityVoltage(0);

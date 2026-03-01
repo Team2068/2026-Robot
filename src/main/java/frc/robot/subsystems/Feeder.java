@@ -16,43 +16,47 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Feeder extends SubsystemBase {
   public SparkMax feeder;
   public DigitalInput beambreak;
-  public Servo blocker = new Servo(9);
+  public Servo blocker = new Servo(5);
+  public int blockerDown = 50;
+  public int blockerUp = 120;
   public boolean blocked = true;
   public SparkFlexConfig config = new SparkFlexConfig();
 
   public Feeder(int feederId, int beambreakId) {
     feeder = new SparkMax(feederId, MotorType.kBrushless);
     beambreak = new DigitalInput(beambreakId);
-    
+
     config.idleMode(IdleMode.kBrake);
     config.smartCurrentLimit(20);
     config.closedLoop.pid(0.004, 0, 0.05);
     feeder.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
-  public void speed(double speed){
+  public void speed(double speed) {
     feeder.set(speed);
   }
 
-  public void volts(double volts){
+  public void volts(double volts) {
     feeder.setVoltage(volts);
   }
 
-  public void stop(){
+  public void stop() {
     feeder.stopMotor();
   }
 
-  public boolean supplied(){
+  public boolean supplied() {
     return beambreak.get();
   }
 
-  public void block(){
-    // TODO Find actual values
-    blocked = !blocked;
-    blocker.setAngle(blocked ? 0 : 90);
+  public void block() {
+    blocker.setAngle(blockerDown);
   }
 
-  public void voltLoop(double volts){
+  public void unblock() {
+    blocker.setAngle(blockerUp);
+  }
+
+  public void voltLoop(double volts) {
     feeder.getClosedLoopController().setSetpoint(volts, ControlType.kVoltage);
   }
 
@@ -61,5 +65,7 @@ public class Feeder extends SubsystemBase {
     SmartDashboard.putBoolean("Supplied", supplied());
     SmartDashboard.putNumber("Feeder RPM", feeder.getEncoder().getVelocity());
     SmartDashboard.putNumber("Blocker Angle", blocker.getAngle());
+    SmartDashboard.putBoolean("Blocked", blocked);
+    SmartDashboard.putNumber("Servo Position", blocker.getPosition());
   }
 }

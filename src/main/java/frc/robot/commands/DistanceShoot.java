@@ -65,6 +65,7 @@ public class DistanceShoot extends Command {
     if (Math.abs(io.flywheel.RPM() - helper.shooterRPM) < RPM_TOLERANCE
         && Math.abs(io.flywheel.hoodAngle() - helper.hoodAngle) < ANGLE_TOLERANCE) {
       io.feeder.voltLoop(7.2);
+      io.feeder.unblock();
     }
   }
 
@@ -91,6 +92,7 @@ public class DistanceShoot extends Command {
 
   @Override
   public void end(boolean interrupted) {
+    io.feeder.block();
     io.flywheel.stopFlywheel();
     io.flywheel.stopHood();
     io.feeder.stop();

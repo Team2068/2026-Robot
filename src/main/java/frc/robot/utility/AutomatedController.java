@@ -85,7 +85,9 @@ public class AutomatedController {
         controller.a().and(automated()).onTrue(new Aimbot(io, swerveState.SCORING));
         controller.y().and(automated()).onTrue(Util.Do(()-> io.chassis.currentState = swerveState.DEFAULT));
         controller.x().and(automated()).onTrue(Util.Do(()-> io.chassis.currentState = swerveState.PASSING));
-        controller.povDown().and(automated()).onTrue(Util.Do(()-> io.chassis.currentState = swerveState.SCORING));
+        controller.povLeft().and(automated()).onTrue(Util.Do(()-> io.chassis.currentState = swerveState.SCORING));
+
+        controller.povDown().and(automated()).onTrue(Util.Do(()-> io.chassis.field_oritented = !io.chassis.field_oritented));
     }
 
     public void configureManual(){
@@ -101,6 +103,9 @@ public class AutomatedController {
         // INTAKE
         controller.y().and( manual()).onTrue(Util.Do(io.intake::intake));
         controller.x().and( manual()).onTrue(Util.Do(()-> io.intake.speed(1))).onFalse(Util.Do(io.intake::stop));
+
+        controller.povLeft().and(manual()).onTrue(Util.Do(() -> io.feeder.block()));
+        controller.povRight().and(manual()).onTrue(Util.Do(() -> io.feeder.unblock()));
     }
 
     void configureCharacterisaton(){
@@ -131,7 +136,7 @@ public class AutomatedController {
         controller.leftBumper().and( debug()).onTrue(Util.Do(() -> io.flywheel.hoodSpeed(0.1))).onFalse(Util.Do(io.flywheel::stopHood));
         controller.rightBumper().and( debug()).onTrue(Util.Do(() -> io.flywheel.hoodSpeed(-0.1))).onFalse(Util.Do(io.flywheel::stopHood));
         controller.rightTrigger().and( debug()).onTrue(Util.Do(() -> io.flywheel.flywheelSpeed(1))).onFalse(Util.Do(io.flywheel::stopFlywheel));
-        // controller.leftTrigger().and( debug()).onTrue(Util.Do(() -> io.feeder.speed(.75))).onFalse(Util.Do(io.feeder::stop));
+        controller.leftTrigger().and( debug()).onTrue(Util.Do(() -> io.feeder.speed(.75))).onFalse(Util.Do(io.feeder::stop));
         controller.povUp().and( debug()).onTrue(Util.Do(io.feeder::stop));
     }
 

@@ -316,6 +316,8 @@ public class Swerve extends SubsystemBase {
         target_states.set(states);
 
         Pose2d pose = odometry.update(rotation(), modulePositions());
+        // TODO During field calibartion test the fused estimation
+        estimatePose("limelight-intake");
         estimatePose("limelight-main");
         posePublisher.set(pose);
         estimatedPublisher.set(estimator.getEstimatedPosition());
