@@ -20,8 +20,7 @@ public class Aimbot extends Command {
   private static final double ANGLE_OFFSET = Math.toRadians(0);
 
   public Aimbot(IO io, swerveState state) {
-    this.io = io;
-    this.state = state;
+    this(io, state, false);
   }
 
   public Aimbot(IO io, swerveState state, boolean auton) {
@@ -52,7 +51,7 @@ public class Aimbot extends Command {
       SmartDashboard.putNumber("Target", Math.toDegrees(target));
 
       io.chassis.targetRotation = pid.atSetpoint() ? 0.0
-          : pid.calculate(Math.toRadians(rotation), target);
+          : pid.calculate(rotation, target);
     }
   }
 
