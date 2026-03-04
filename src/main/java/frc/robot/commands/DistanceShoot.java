@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Swerve.swerveState;
@@ -61,6 +62,7 @@ public class DistanceShoot extends Command {
 
     io.flywheel.hoodAngle(helper.hoodAngle);
     io.flywheel.RPM(helper.shooterRPM);
+    SmartDashboard.putNumber("Target Shooter RPM", helper.shooterRPM);
 
     if (Math.abs(io.flywheel.RPM() - helper.shooterRPM) < RPM_TOLERANCE
         && Math.abs(io.flywheel.hoodAngle() - helper.hoodAngle) < ANGLE_TOLERANCE) {

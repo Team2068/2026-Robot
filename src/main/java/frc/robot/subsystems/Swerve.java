@@ -104,7 +104,7 @@ public class Swerve extends SubsystemBase {
         estimatorWithYaw = new SwerveDrivePoseEstimator(kinematics, rotation(), modulePositions(), odometry.getPoseMeters());
 
         AutoBuilder.configure(
-                this::getEstimatedPose, // See how using pose estimation affects auton.
+                this::pose, // See how using pose estimation affects auton.
                 this::resetOdometry,
                 this::getSpeeds,
                 (speeds, feedforwards) -> drive(speeds),

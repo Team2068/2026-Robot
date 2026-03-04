@@ -13,11 +13,11 @@ import frc.robot.utility.IO;
 public class Aimbot extends Command {
   IO io;
   swerveState state;
-  PIDController pid = new PIDController(0.0001, 0, 0.00); // TODO tune this
+  PIDController pid = new PIDController(0.2, 0, 0.00); // TODO tune this
   boolean blue;
   double target;
   boolean auton = false;
-  private static final double ANGLE_OFFSET = Math.toRadians(0);
+  private static final double ANGLE_OFFSET = Math.toRadians(180);
 
   public Aimbot(IO io, swerveState state) {
     this(io, state, false);
@@ -33,7 +33,7 @@ public class Aimbot extends Command {
   public void initialize() {
     io.chassis.currentState = state;
     blue = DriverStation.getAlliance().get() == Alliance.Blue;
-    pid.setTolerance(Math.toRadians(7));
+    pid.setTolerance(Math.toRadians(3.5));
     pid.enableContinuousInput(-Math.PI, Math.PI);
     pid.reset();
   }
@@ -44,14 +44,16 @@ public class Aimbot extends Command {
     double rotation = Math.toRadians(io.chassis.getEstimatedRotation()) - Math.PI;
 
     if (state == swerveState.SCORING) {
+
       Translation2d hub = blue ? RobotContainer.BLUE_HUB : RobotContainer.RED_HUB;
       Translation2d diff = hub.minus(io.chassis.getEstimatedPose().getTranslation());
       target = Math.atan2(diff.getY(), diff.getX()) + ANGLE_OFFSET;
+      double output = pid.calculate(rotation, target);
 
       SmartDashboard.putNumber("Target", Math.toDegrees(target));
 
       io.chassis.targetRotation = pid.atSetpoint() ? 0.0
-          : pid.calculate(rotation, target);
+          : output;
     }
   }
 

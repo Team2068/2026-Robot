@@ -47,7 +47,7 @@ public class DefaultDrive extends Command {
     public void execute() {
         double down_scale = 1.25 - modifyAxis(controller.getLeftTriggerAxis());
         double up_scale = (Swerve.Constants.MAX_VELOCITY * .2) * modifyAxis(controller.getRightTriggerAxis());
-        double shooting = (io.chassis.currentState == swerveState.SCORING) ? 5 : 1;
+        double shooting = (io.chassis.currentState == swerveState.SCORING) ? 2 : 1;
 
         double scale = (Constants.transFactor * down_scale + up_scale) / shooting;
         double rot_scale = Constants.rotFactor * down_scale;

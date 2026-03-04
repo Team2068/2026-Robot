@@ -35,20 +35,19 @@ public class RobotContainer {
   StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault().getTable("Debug")
       .getStructTopic("Blue Hub Pose", Pose2d.struct).publish();
 
-  private final SendableChooser<Command> auto_selector;
+  private SendableChooser<Command> auto_selector;
   Command current_auto = new PrintCommand("");
   final SendableChooser<Integer> driver_selector = new SendableChooser<Integer>();
 
-  // HttpCamera camera = new HttpCamera("Limelight", "http://limelight-main.local:5800");
+  HttpCamera camera = new HttpCamera("Limelight", "http://limelight-intake.local:5800");
 
   public RobotContainer() {
     // For now have the limelight for drivers unless we get the PhotonVision cameras setup
-    // CameraServer.startAutomaticCapture(camera);
+    CameraServer.startAutomaticCapture(camera);
+    configureAuton();
 
     main = new AutomatedController(0, io);
     CanandEventLoop.getInstance();
-
-    configureAuton();
 
     auto_selector = AutoBuilder.buildAutoChooser();
     auto_selector.onChange((command) -> {
