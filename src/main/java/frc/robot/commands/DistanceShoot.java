@@ -57,7 +57,7 @@ public class DistanceShoot extends Command {
       }
     } else {
       // TODO Find optimal values for passing from mid field
-      helper = new DistanceShootUtil(0, 6000);
+      helper = new DistanceShootUtil(14, 5800);
     }
 
     io.flywheel.hoodAngle(helper.hoodAngle);
@@ -65,7 +65,7 @@ public class DistanceShoot extends Command {
     SmartDashboard.putNumber("Target Shooter RPM", helper.shooterRPM);
 
     if (Math.abs(io.flywheel.RPM() - helper.shooterRPM) < RPM_TOLERANCE
-        && Math.abs(io.flywheel.hoodAngle() - helper.hoodAngle) < ANGLE_TOLERANCE) {
+        && Math.abs(io.flywheel.hoodAngle() - helper.hoodAngle) < ANGLE_TOLERANCE || io.chassis.currentState == swerveState.PASSING) {
       io.feeder.voltLoop(7.2);
       io.feeder.unblock();
     }
