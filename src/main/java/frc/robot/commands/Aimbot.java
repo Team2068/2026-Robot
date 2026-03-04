@@ -33,7 +33,7 @@ public class Aimbot extends Command {
   public void initialize() {
     io.chassis.currentState = state;
     blue = DriverStation.getAlliance().get() == Alliance.Blue;
-    pid.setTolerance(Math.toRadians(3.5));
+    pid.setTolerance(Math.toRadians(1.5));
     pid.enableContinuousInput(-Math.PI, Math.PI);
     pid.reset();
   }
