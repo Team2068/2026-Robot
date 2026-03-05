@@ -71,7 +71,7 @@ public class Swerve extends SubsystemBase {
     public boolean active = true;
 
     public static enum swerveState {
-        DEFAULT, SCORING, PASSING
+        DEFAULT, SCORING, SCORINGAIMBOT, PASSING
     }
 
     public Double targetRotation = null;

@@ -19,11 +19,14 @@ public class DistanceShoot extends Command {
   private static final int RPM_TOLERANCE = 120;
   private static final double ANGLE_TOLERANCE = 1.5;
 
+  private double feederVolts = 7.2;
+
   Timer timer = new Timer();
 
   DistanceShootUtil[] data = {new DistanceShootUtil(0, 2, 4400), new DistanceShootUtil(1.67, 4, 4500), new DistanceShootUtil(2.05, 6, 4600), new DistanceShootUtil(2.33, 8, 4600), new DistanceShootUtil(2.75, 16, 4900), new DistanceShootUtil(3.5, 19, 5200), new DistanceShootUtil(4.0, 21, 5400), new DistanceShootUtil(4.9, 28, 5900) };
 
   DistanceShootUtil distanceUtil = null;
+
 
   public DistanceShoot(IO io) {
     this.io = io;
@@ -34,6 +37,13 @@ public class DistanceShoot extends Command {
     this.io = io;
     addRequirements(io.flywheel, io.feeder);
     this.distanceUtil = distanceUtil;
+  }
+
+  public DistanceShoot(IO io, DistanceShootUtil distanceUtil, double feederVolts) {
+    this.io = io;
+    addRequirements(io.flywheel, io.feeder);
+    this.distanceUtil = distanceUtil;
+    this.feederVolts = feederVolts;
   }
 
   @Override
@@ -66,7 +76,7 @@ public class DistanceShoot extends Command {
 
     if (Math.abs(io.flywheel.RPM() - helper.shooterRPM) < RPM_TOLERANCE
         && Math.abs(io.flywheel.hoodAngle() - helper.hoodAngle) < ANGLE_TOLERANCE || io.chassis.currentState == swerveState.PASSING) {
-      io.feeder.voltLoop(7.2);
+      io.feeder.voltLoop(feederVolts);
       io.feeder.unblock();
     }
   }

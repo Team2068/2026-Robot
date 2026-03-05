@@ -14,7 +14,7 @@ import frc.robot.subsystems.Swerve.swerveState;
 public class AutomatedController {
     public final CommandXboxController controller;
     public final SendableChooser<Runnable> selector = new SendableChooser<Runnable>();
-    public int mode = 3;
+    public int mode = 0;
     public GenericHID rumble = new GenericHID(0);
 
     IO io;
@@ -84,26 +84,26 @@ public class AutomatedController {
     }
 
     void configureAutomated() {
+        // CHASSIS CONTROL
         controller.back().onTrue(Util.Do(io.chassis::resetAngle, io.chassis));
-
-        // INTAKE
-        controller.b().and(automated()).onTrue(Util.Do(io.intake::intake));
-        controller.leftBumper().and(automated()).onTrue(Util.Do(() -> io.intake.speed(-55))).onFalse(Util.Do(io.intake::stop));
-
-        // FLYWHEEL
-        // TODO make sure the trigger shooting works
-        controller.rightTrigger().and(automated()).whileTrue(new DistanceShoot(io));
-
-        // STATE CONTROLLERS AND AIMBOT
-        controller.a().and(automated()).onTrue(new Aimbot(io, swerveState.SCORING));
-        controller.y().and(automated()).onTrue(Util.Do(() -> io.chassis.currentState = swerveState.SCORING));
-        controller.x().and(automated()).onTrue(Util.Do(() -> io.chassis.currentState = swerveState.PASSING));
-        controller.povLeft().and(automated()).onTrue(Util.Do(() -> io.chassis.currentState = swerveState.SCORING));
-
         controller.povDown().and(automated())
                 .onTrue(Util.Do(() -> io.chassis.field_oritented = !io.chassis.field_oritented));
 
+        // INTAKE
+        controller.leftBumper().and(automated()).onTrue(Util.Do(() -> io.intake.speed(-55)))
+                .onFalse(Util.Do(io.intake::stop));
+        controller.rightBumper().and(automated()).onTrue(Util.Do(io.intake::intake));
+
+        // FLYWHEEL
+        controller.rightTrigger().and(automated()).whileTrue(new DistanceShoot(io));
+        controller.povUp().and(automated()).whileTrue(new DistanceShoot(io, new DistanceShootUtil(0, -5000), -7.2));
         controller.povRight().and(automated()).onTrue(Util.Do(io.flywheel::resetEncoder));
+
+        // STATE CONTROLLERS AND AIMBOT
+        controller.a().and(automated()).onTrue(new Aimbot(io, swerveState.SCORINGAIMBOT));
+        controller.b().and(automated()).onTrue(Util.Do(() -> io.chassis.currentState = swerveState.SCORING));
+        controller.y().and(automated()).onTrue(Util.Do(() -> io.chassis.currentState = swerveState.PASSING));
+        controller.x().and(automated()).onTrue(Util.Do(() -> io.chassis.currentState = swerveState.PASSING));
     }
 
     public void configureManual() {

@@ -43,8 +43,7 @@ public class Aimbot extends Command {
     // Math.atan2 returns a range of -pi to pi, this normalizes the estimated rotation.
     double rotation = Math.toRadians(io.chassis.getEstimatedRotation()) - Math.PI;
 
-    if (state == swerveState.SCORING) {
-
+    if (state == swerveState.SCORINGAIMBOT) {
       Translation2d hub = blue ? RobotContainer.BLUE_HUB : RobotContainer.RED_HUB;
       Translation2d diff = hub.minus(io.chassis.getEstimatedPose().getTranslation());
       target = Math.atan2(diff.getY(), diff.getX()) + ANGLE_OFFSET;
