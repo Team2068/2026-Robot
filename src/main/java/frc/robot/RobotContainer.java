@@ -23,7 +23,6 @@ import frc.robot.utility.IO;
 import frc.robot.utility.Util;
 import frc.robot.utility.AutomatedController;
 import frc.robot.commands.Aimbot;
-import frc.robot.commands.Auton;
 import frc.robot.commands.DefaultDrive;
 import frc.robot.commands.DistanceShoot;
 import frc.robot.subsystems.Swerve.swerveState;
@@ -74,6 +73,5 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return auto_selector.getSelected();
-    // return new Auton(io);
   }
 }

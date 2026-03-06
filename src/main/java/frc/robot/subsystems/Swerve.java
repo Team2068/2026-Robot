@@ -141,12 +141,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public void drive(ChassisSpeeds speeds) {
-        if(targetRotation == null){
-            this.speeds = speeds;
-        }
-        else{
-            this.speeds = new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, targetRotation);
-        }
+        this.speeds = speeds;
     }
 
     public void stop() {
