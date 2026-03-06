@@ -63,5 +63,6 @@ public class Intake extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putBoolean("Active", active);
     SmartDashboard.putNumber("Intake Speed", intake.get());
+    SmartDashboard.putNumber("Intake current", intake.getOutputCurrent());
   }
 }

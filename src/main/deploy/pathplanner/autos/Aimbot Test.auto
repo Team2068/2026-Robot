@@ -9,9 +9,21 @@
           "data": {
             "commands": [
               {
+                "type": "path",
+                "data": {
+                  "pathName": "1 Meter Straight"
+                }
+              },
+              {
                 "type": "named",
                 "data": {
-                  "name": "Aimbot"
+                  "name": "Intake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "DistanceShoot"
                 }
               }
             ]

@@ -23,6 +23,7 @@ import frc.robot.utility.IO;
 import frc.robot.utility.Util;
 import frc.robot.utility.AutomatedController;
 import frc.robot.commands.Aimbot;
+import frc.robot.commands.Auton;
 import frc.robot.commands.DefaultDrive;
 import frc.robot.commands.DistanceShoot;
 import frc.robot.subsystems.Swerve.swerveState;
@@ -65,12 +66,14 @@ public class RobotContainer {
   }
 
   public void configureAuton() {
-    NamedCommands.registerCommand("Aimbot", new Aimbot(io, swerveState.SCORING,
+    NamedCommands.registerCommand("Aimbot", new Aimbot(io, swerveState.SCORINGAIMBOT,
     true));
     NamedCommands.registerCommand("DistanceShoot", new DistanceShoot(io));
+    NamedCommands.registerCommand("Intake", Util.Do(io.intake::intake));
   }
 
   public Command getAutonomousCommand() {
     return auto_selector.getSelected();
+    // return new Auton(io);
   }
 }

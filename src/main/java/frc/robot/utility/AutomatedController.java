@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Aimbot;
 import frc.robot.commands.DistanceShoot;
+import frc.robot.commands.UnjamShooter;
 import frc.robot.subsystems.Swerve.swerveState;
 
 public class AutomatedController {
@@ -96,7 +97,7 @@ public class AutomatedController {
 
         // FLYWHEEL
         controller.rightTrigger().and(automated()).whileTrue(new DistanceShoot(io));
-        controller.povUp().and(automated()).whileTrue(new DistanceShoot(io, new DistanceShootUtil(0, -5000), -7.2));
+        controller.povUp().and(automated()).whileTrue(new UnjamShooter(io));
         controller.povRight().and(automated()).onTrue(Util.Do(io.flywheel::resetEncoder));
 
         // STATE CONTROLLERS AND AIMBOT

@@ -70,7 +70,7 @@ public class Module {
 
         drive.getConfigurator().apply(driveConfig);
 
-        tab.addDouble("Absolute Angle", () -> Math.toDegrees(angle()));
+        tab.addDouble("Absolute Module Angle", () -> Math.toDegrees(angle()));
         tab.addDouble("Current Angle", () -> steer.getPosition().getValueAsDouble() * 360);
         tab.addDouble("Angle Difference", () -> Math.toDegrees(angle() - (steer.getPosition().getValueAsDouble() * Swerve.PI2)));
         tab.addDouble("Target Angle", () -> Math.toDegrees(desiredAngle));

@@ -14,6 +14,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -22,8 +23,9 @@ public class Flywheel extends SubsystemBase {
   public TalonFXConfiguration config;
   public SparkMaxConfig hoodConfig;
   public SparkMax hood;
-  public DutyCycleEncoder encoder = new DutyCycleEncoder(1);
+  public DutyCycleEncoder encoder = new DutyCycleEncoder(3);
   public boolean encoderActive;
+  Timer timer = new Timer();
 
   public VelocityVoltage control = new VelocityVoltage(0);
 
@@ -56,6 +58,8 @@ public class Flywheel extends SubsystemBase {
     hoodConfig.softLimit.forwardSoftLimit(66.5);
     hoodConfig.softLimit.reverseSoftLimit(1.5);
     hood.configure(hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    timer.start();
   }
 
   public void flywheelSpeed(double speed) {
@@ -97,11 +101,11 @@ public class Flywheel extends SubsystemBase {
 
   public void syncEncoder(){
     if(encoderActive)
-      hood.getEncoder().setPosition(encoder.get());
+      hood.getEncoder().setPosition(absolutePosition());
   }
 
   public double absolutePosition(){
-    return encoder.get() * (360 / 1.7);
+    return (encoder.get() * (360 / 1.7)) - 85.11;
   }
 
   public double RPM() {
@@ -111,7 +115,10 @@ public class Flywheel extends SubsystemBase {
   @Override
   public void periodic() {
     encoderActive = encoder.isConnected();
-    // syncEncoder();
+    if(timer.get() >= 2.0){
+        syncEncoder();
+        timer.restart();
+    }
 
     SmartDashboard.putNumber("Hood Angle", hoodAngle());
     SmartDashboard.putNumber("Hood Absolute Angle", absolutePosition());
