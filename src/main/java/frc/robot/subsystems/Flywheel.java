@@ -115,7 +115,7 @@ public class Flywheel extends SubsystemBase {
   @Override
   public void periodic() {
     encoderActive = encoder.isConnected();
-    if(timer.get() >= 2.0){
+    if(timer.get() >= 1.0){
         syncEncoder();
         timer.restart();
     }

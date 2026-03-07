@@ -38,6 +38,13 @@ public class DistanceShoot extends Command {
     addRequirements(io.flywheel, io.feeder);
     this.distanceUtil = distanceUtil;
   }
+  public DistanceShoot(IO io, boolean auto) {
+    this.io = io;
+    addRequirements(io.flywheel, io.feeder);
+    if(auto){
+      io.chassis.currentState = swerveState.SCORING;
+    }
+  }
 
   @Override
   public void initialize() {
