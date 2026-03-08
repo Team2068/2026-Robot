@@ -15,4 +15,10 @@ public class DistanceShootUtil {
         this.hoodAngle = hoodAngle;
         this.shooterRPM = shooterRPM;
     }
+
+    public DistanceShootUtil(boolean comp, double distance, double hoodAngle, double shooterRPM) {
+        this.distance = distance;
+        this.hoodAngle = hoodAngle;
+        this.shooterRPM = shooterRPM;
+    }
 }
