@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -40,7 +41,8 @@ public class Aimbot extends Command {
 
   @Override
   public void execute() {
-    // Math.atan2 returns a range of -pi to pi, this normalizes the estimated rotation.
+    // Math.atan2 returns a range of -pi to pi, this normalizes the estimated
+    // rotation.
     double rotation = Math.toRadians(io.chassis.getEstimatedRotation()) - Math.PI;
 
     if (state == swerveState.SCORINGAIMBOT) {
@@ -51,8 +53,13 @@ public class Aimbot extends Command {
 
       SmartDashboard.putNumber("Target", Math.toDegrees(target));
 
-      io.chassis.targetRotation = pid.atSetpoint() ? 0.0
-          : output;
+      if (auton) {
+        io.chassis.drive(new ChassisSpeeds(0, 0, output));
+      } else {
+        io.chassis.targetRotation = pid.atSetpoint() ? 0.0
+            : output;
+      }
+
     }
   }
 

@@ -78,6 +78,7 @@ public class DistanceShoot extends Command {
     if (Math.abs(io.flywheel.RPM() - helper.shooterRPM) < RPM_TOLERANCE
         && Math.abs(io.flywheel.hoodAngle() - helper.hoodAngle) < ANGLE_TOLERANCE || io.chassis.currentState == swerveState.PASSING) {
       io.feeder.voltLoop(feederVolts);
+      io.feeder.agitatorSpeed(.20);
       io.feeder.unblock();
     }
   }
@@ -109,6 +110,7 @@ public class DistanceShoot extends Command {
     io.flywheel.stopFlywheel();
     io.flywheel.stopHood();
     io.feeder.stop();
+    io.feeder.stopAgitator();
   }
 
   @Override

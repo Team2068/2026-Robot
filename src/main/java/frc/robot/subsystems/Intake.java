@@ -18,10 +18,11 @@ public class Intake extends SubsystemBase {
 
 
   public Intake(int id) {
-    intake = new SparkMax(id, MotorType.kBrushed);
+    intake = new SparkMax(id, MotorType.kBrushless);
     
     config = new SparkMaxConfig();
     config.idleMode(IdleMode.kCoast);
+    config.smartCurrentLimit(40);
     
     intake.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }

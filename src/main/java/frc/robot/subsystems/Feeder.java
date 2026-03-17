@@ -4,32 +4,36 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkBase.ControlType;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Feeder extends SubsystemBase {
   public SparkMax feeder;
-  public DigitalInput beambreak;
+  public SparkMax agitator;
   public Servo blocker = new Servo(5);
   public int blockerDown = 50;
   public int blockerUp = 120;
   public boolean blocked = true;
-  public SparkFlexConfig config = new SparkFlexConfig();
+  public SparkMaxConfig feederConfig = new SparkMaxConfig();
+  public SparkMaxConfig agitatorConfig = new SparkMaxConfig();
 
-  public Feeder(int feederId, int beambreakId) {
+  public Feeder(int feederId, int agitatorId) {
+    
+    agitator = new SparkMax(agitatorId, MotorType.kBrushless);
+    agitatorConfig.idleMode(IdleMode.kCoast);
+    agitatorConfig.smartCurrentLimit(40);
+    agitator.configure(agitatorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
     feeder = new SparkMax(feederId, MotorType.kBrushless);
-    beambreak = new DigitalInput(beambreakId);
-
-    config.idleMode(IdleMode.kBrake);
-    config.smartCurrentLimit(20);
-    config.closedLoop.pid(0.004, 0, 0.05);
-    feeder.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    feederConfig.idleMode(IdleMode.kBrake);
+    feederConfig.smartCurrentLimit(40);
+    feederConfig.closedLoop.pid(0.004, 0, 0.05);
+    feeder.configure(feederConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   public void speed(double speed) {
@@ -44,10 +48,6 @@ public class Feeder extends SubsystemBase {
     feeder.stopMotor();
   }
 
-  public boolean supplied() {
-    return beambreak.get();
-  }
-
   public void block() {
     blocker.setAngle(blockerDown);
   }
@@ -60,9 +60,20 @@ public class Feeder extends SubsystemBase {
     feeder.getClosedLoopController().setSetpoint(volts, ControlType.kVoltage);
   }
 
+  public void agitatorSpeed(double speed) {
+    agitator.set(speed);
+  }
+
+  public void agitatorVolts(double volts) {
+    agitator.setVoltage(volts);
+  }
+
+  public void stopAgitator() {
+    agitator.stopMotor();
+  }
+
   @Override
   public void periodic() {
-    SmartDashboard.putBoolean("Supplied", supplied());
     SmartDashboard.putNumber("Feeder RPM", feeder.getEncoder().getVelocity());
     SmartDashboard.putNumber("Blocker Angle", blocker.getAngle());
     SmartDashboard.putBoolean("Blocked", blocked);

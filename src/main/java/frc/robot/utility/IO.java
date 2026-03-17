@@ -11,7 +11,7 @@ public class IO extends SubsystemBase {
         public final Swerve chassis = new Swerve();
         public final Intake intake = new Intake(15);
         public final Flywheel flywheel = new Flywheel(16, 18);
-        public final Feeder feeder = new Feeder(17, 0);
+        public final Feeder feeder = new Feeder(17, 19);
         public final PowerDistribution pdp = new PowerDistribution(1, ModuleType.kRev);
         
         public IO() {
