@@ -44,14 +44,14 @@ public class Intake extends SubsystemBase {
 
   public void intake(){
     if(!active)
-      speed(0.55);
+      speed(-1);
     else
       stop();
   }
 
   public void intake(boolean reverse){
     if(!active)
-      speed(0.55 * (reverse ? -1 : 1));
+      speed(1 * (reverse ? -1 : 1));
     else
       stop();
   }

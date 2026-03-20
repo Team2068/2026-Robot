@@ -91,7 +91,7 @@ public class AutomatedController {
                 .onTrue(Util.Do(() -> io.chassis.field_oritented = !io.chassis.field_oritented));
 
         // INTAKE
-        controller.leftBumper().and(automated()).onTrue(Util.Do(() -> io.intake.speed(-.80)))
+        controller.leftBumper().and(automated()).onTrue(Util.Do(() -> io.intake.speed(1)))
                 .onFalse(Util.Do(io.intake::stop));
         controller.rightBumper().and(automated()).onTrue(Util.Do(io.intake::intake));
 

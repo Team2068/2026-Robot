@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Swerve.swerveState;
 import frc.robot.utility.DistanceShootUtil;
@@ -19,6 +21,7 @@ public class DistanceShoot extends Command {
   private static final int RPM_TOLERANCE = 120;
   private static final double ANGLE_TOLERANCE = 1.5;
   private boolean comp = true;
+  private boolean auto = false;
 
   private double feederVolts = -7.2;
 
@@ -42,6 +45,7 @@ public class DistanceShoot extends Command {
   public DistanceShoot(IO io, boolean auto) {
     this.io = io;
     addRequirements(io.flywheel, io.feeder);
+    this.auto = auto;
     if(auto){
       io.chassis.currentState = swerveState.SCORING;
     }
@@ -52,6 +56,8 @@ public class DistanceShoot extends Command {
     blue = DriverStation.getAlliance().get() == Alliance.Blue;
     timer.start();
     timer.restart();
+
+    
   }
 
   @Override
@@ -78,8 +84,10 @@ public class DistanceShoot extends Command {
     if (Math.abs(io.flywheel.RPM() - helper.shooterRPM) < RPM_TOLERANCE
         && Math.abs(io.flywheel.hoodAngle() - helper.hoodAngle) < ANGLE_TOLERANCE || io.chassis.currentState == swerveState.PASSING) {
       io.feeder.voltLoop(feederVolts);
-      io.feeder.agitatorSpeed(.20);
       io.feeder.unblock();
+      
+      new WaitCommand(0.20);
+      io.feeder.agitatorSpeed(0.8);
     }
   }
 
