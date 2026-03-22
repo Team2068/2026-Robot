@@ -105,7 +105,7 @@ public class Flywheel extends SubsystemBase {
   }
 
   public double absolutePosition(){
-    return (encoder.get() * (360 / 1.7)) - 85.11;
+    return (encoder.get() * (360 / 1.7)) - 167.56 - 3.8;
   }
 
   public double RPM() {
@@ -113,6 +113,7 @@ public class Flywheel extends SubsystemBase {
   }
 
   @Override
+
   public void periodic() {
     encoderActive = encoder.isConnected();
     if(timer.get() >= 1.0){
