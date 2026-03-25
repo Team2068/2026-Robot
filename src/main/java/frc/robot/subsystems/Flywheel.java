@@ -105,7 +105,7 @@ public class Flywheel extends SubsystemBase {
   }
 
   public double absolutePosition(){
-    return (encoder.get() * (360 / 1.7)) - 167.56 - 3.8;
+    return (encoder.get() * (360 / 1.7)) - 112.52;
   }
 
   public double RPM() {

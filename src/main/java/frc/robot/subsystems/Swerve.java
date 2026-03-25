@@ -133,11 +133,11 @@ public class Swerve extends SubsystemBase {
     public Rotation2d rotation() {
         double rotation = (pigeon2.getYaw().getValueAsDouble() + 90) % 360;
         rotation += (rotation < 0) ? 360 : 0;
-        return new Rotation2d(Degree.of(rotation));
+        return new Rotation2d(Degree.of(rotation - 180));
     }
 
     public void adjustRotation() {
-        pigeon2.setYaw((rotation().getDegrees() + 180) % 360);
+        pigeon2.setYaw((rotation().getDegrees() + 90) % 360);
     }
 
     public void drive(ChassisSpeeds speeds) {

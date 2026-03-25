@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Aimbot;
 import frc.robot.commands.DistanceShoot;
+import frc.robot.commands.DistanceShootAgitate;
 import frc.robot.commands.UnjamShooter;
 import frc.robot.subsystems.Swerve.swerveState;
 
@@ -105,6 +106,8 @@ public class AutomatedController {
         controller.b().and(automated()).onTrue(Util.Do(() -> io.chassis.currentState = swerveState.SCORING));
         controller.y().and(automated()).onTrue(Util.Do(() -> io.chassis.currentState = swerveState.PASSING));
         controller.x().and(automated()).onTrue(Util.Do(() -> io.chassis.currentState = swerveState.PASSING));
+
+        controller.povLeft().and(automated()).onTrue(new DistanceShootAgitate(io));
     }
 
     public void configureManual() {

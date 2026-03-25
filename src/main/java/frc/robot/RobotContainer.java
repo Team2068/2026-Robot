@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.utility.IO;
 import frc.robot.utility.Util;
 import frc.robot.utility.AutomatedController;
+import frc.robot.commands.AgitateChassis;
 import frc.robot.commands.Aimbot;
 import frc.robot.commands.DefaultDrive;
 import frc.robot.commands.DistanceShoot;
@@ -70,6 +71,7 @@ public class RobotContainer {
     true));
     NamedCommands.registerCommand("DistanceShoot", new DistanceShoot(io, true));
     NamedCommands.registerCommand("Intake", Util.Do(io.intake::intake));
+    NamedCommands.registerCommand("Agitate", new AgitateChassis(io));
   }
 
   public Command getAutonomousCommand() {

@@ -20,7 +20,7 @@ public class DistanceShoot extends Command {
   // TODO tune shooter pid so tolerance can be lower
   private static final int RPM_TOLERANCE = 120;
   private static final double ANGLE_TOLERANCE = 1.5;
-  private boolean comp = true;
+  private boolean comp = false;
   private boolean auto = false;
 
   private double feederVolts = -7.2;
@@ -54,9 +54,7 @@ public class DistanceShoot extends Command {
   @Override
   public void initialize() {
     blue = DriverStation.getAlliance().get() == Alliance.Blue;
-    timer.start();
     timer.restart();
-
     
   }
 
@@ -109,7 +107,10 @@ public class DistanceShoot extends Command {
     double hood = lower.hoodAngle + factor * (upper.hoodAngle - lower.hoodAngle);
     double rpm = lower.shooterRPM + factor * (upper.shooterRPM - lower.shooterRPM);
 
-    return new DistanceShootUtil(distance, hood, rpm);
+    if(comp)
+      return new DistanceShootUtil(distance, hood, rpm);
+    else
+      return new DistanceShootUtil(distance, hood, rpm - 250);
   }
 
   @Override
@@ -119,10 +120,11 @@ public class DistanceShoot extends Command {
     io.flywheel.stopHood();
     io.feeder.stop();
     io.feeder.stopAgitator();
+    timer.restart();
   }
 
   @Override
   public boolean isFinished() {
-    return false;
+    return auto ? (timer.get() >= 4.5) : false;
   }
 }
