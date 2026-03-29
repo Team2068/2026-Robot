@@ -3,73 +3,57 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.0334704830053665,
-        "y": 6.0
+        "x": 3.6782110912343464,
+        "y": 5.552075134168158
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.0334704830053663,
-        "y": 6.0
-      },
-      "isLocked": false,
-      "linkedName": "End Of Depot"
-    },
-    {
-      "anchor": {
-        "x": 1.5499545454545451,
-        "y": 5.230590909090909
-      },
-      "prevControl": {
-        "x": 0.5499545454545451,
-        "y": 5.230590909090909
-      },
-      "nextControl": {
-        "x": 2.549954545454545,
-        "y": 5.230590909090909
+        "x": 3.9872744200725294,
+        "y": 5.560654036723439
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.2716704545454545,
-        "y": 5.62225
+        "x": 2.6073345259391765,
+        "y": 5.552075134168158
       },
       "prevControl": {
-        "x": 1.8953522727272727,
-        "y": 5.385193181818181
+        "x": 3.123363342870672,
+        "y": 5.548417592821077
       },
       "nextControl": {
-        "x": 0.6479886363636361,
-        "y": 5.859306818181819
+        "x": 2.0913057090076808,
+        "y": 5.555732675515238
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.189215909090909,
-        "y": 5.127522727272727
+        "x": 6.9719677996422185,
+        "y": 5.552075134168158
       },
       "prevControl": {
-        "x": 0.9186022727272725,
-        "y": 5.493414772727274
+        "x": 5.14008934824266,
+        "y": 5.643143618616296
       },
       "nextControl": {
-        "x": 1.4598295454545454,
-        "y": 4.761630681818181
+        "x": 8.803846251041778,
+        "y": 5.461006649720019
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.4674999999999998,
-        "y": 5.034761363636364
+        "x": 2.980518783542039,
+        "y": 5.324919499105545
       },
       "prevControl": {
-        "x": 1.460481902003265,
-        "y": 4.784859890450414
+        "x": 5.462209350923388,
+        "y": 5.41730117816949
       },
       "nextControl": null,
       "isLocked": false,
@@ -81,8 +65,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 0.75,
-    "maxAcceleration": 0.75,
+    "maxVelocity": 1.75,
+    "maxAcceleration": 1.75,
     "maxAngularVelocity": 300.0,
     "maxAngularAcceleration": 300.0,
     "nominalVoltage": 12.0,
@@ -90,13 +74,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 90.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }

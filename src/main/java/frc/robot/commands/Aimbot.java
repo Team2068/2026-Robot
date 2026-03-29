@@ -17,17 +17,23 @@ public class Aimbot extends Command {
   PIDController pid = new PIDController(0.2, 0, 0.0001); // TODO tune this
   boolean blue;
   double target;
-  boolean auton = false;
-  private static final double ANGLE_OFFSET = Math.toRadians(180);
 
-  public Aimbot(IO io, swerveState state) {
-    this(io, state, false);
+  public static enum aimbotState {
+    DEFAULT, AUTO, NOSTOPAUTO
   }
 
-  public Aimbot(IO io, swerveState state, boolean auton) {
+  aimbotState aimbotMode;
+
+  private static final double ANGLE_OFFSET = Math.toRadians(187);
+
+  public Aimbot(IO io, swerveState state) {
+    this(io, state, aimbotState.DEFAULT);
+  }
+
+  public Aimbot(IO io, swerveState state, aimbotState aimbotMode) {
     this.io = io;
     this.state = state;
-    this.auton = auton;
+    this.aimbotMode = aimbotMode;
   }
 
   @Override
@@ -53,9 +59,10 @@ public class Aimbot extends Command {
 
       SmartDashboard.putNumber("Target", Math.toDegrees(target));
 
-      if (auton) {
+      if (aimbotMode == aimbotState.AUTO || aimbotMode == aimbotState.NOSTOPAUTO) {
         io.chassis.drive(new ChassisSpeeds(0, 0, output));
-      } else {
+      }
+      else {
         io.chassis.targetRotation = pid.atSetpoint() ? 0.0
             : output;
       }
@@ -70,7 +77,14 @@ public class Aimbot extends Command {
 
   @Override
   public boolean isFinished() {
-    return auton ? pid.atSetpoint()
-        : (io.chassis.currentState != state);
+    if(aimbotMode == aimbotState.AUTO){
+      return pid.atSetpoint();
+    }
+    else if(aimbotMode == aimbotState.NOSTOPAUTO){
+      return io.chassis.currentState != state;
+    }
+    else{
+      return io.chassis.currentState != state;
+    }
   }
 }

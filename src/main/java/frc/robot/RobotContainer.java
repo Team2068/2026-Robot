@@ -26,6 +26,7 @@ import frc.robot.commands.AgitateChassis;
 import frc.robot.commands.Aimbot;
 import frc.robot.commands.DefaultDrive;
 import frc.robot.commands.DistanceShoot;
+import frc.robot.commands.Aimbot.aimbotState;
 import frc.robot.subsystems.Swerve.swerveState;
 
 public class RobotContainer {
@@ -68,9 +69,10 @@ public class RobotContainer {
   public void configureAuton() {
     NamedCommands.registerCommand("SyncEncoders", Util.Do(io.chassis::syncEncoders));
     NamedCommands.registerCommand("Aimbot", new Aimbot(io, swerveState.SCORINGAIMBOT,
-    true));
+    aimbotState.AUTO));
+    NamedCommands.registerCommand("NoStopAimbot", new Aimbot(io, swerveState.SCORINGAIMBOT, aimbotState.NOSTOPAUTO));
     NamedCommands.registerCommand("DistanceShoot", new DistanceShoot(io, true));
-    NamedCommands.registerCommand("Intake", Util.Do(io.intake::intake));
+    NamedCommands.registerCommand("Intake", Util.Do(()-> io.intake.speed(-1)));
     NamedCommands.registerCommand("Agitate", new AgitateChassis(io));
   }
 

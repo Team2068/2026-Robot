@@ -27,10 +27,12 @@ public class DistanceShoot extends Command {
 
   Timer timer = new Timer();
 
-  DistanceShootUtil[] data = {new DistanceShootUtil(comp,0, 2, 5050), new DistanceShootUtil(comp, 1.67, 4, 5150), new DistanceShootUtil(comp, 2.05, 6, 5250), new DistanceShootUtil(comp, 2.33, 8, 5300), new DistanceShootUtil(comp, 2.75, 16, 5500), new DistanceShootUtil(comp, 3.5, 19, 5750), new DistanceShootUtil(comp, 4.0, 21, 5850), new DistanceShootUtil(comp, 4.9, 28, 5900) };
+  DistanceShootUtil[] data = { new DistanceShootUtil(comp, 0, 2, 5050), new DistanceShootUtil(comp, 1.67, 4, 5150),
+      new DistanceShootUtil(comp, 2.05, 6, 5250), new DistanceShootUtil(comp, 2.33, 8, 5300),
+      new DistanceShootUtil(comp, 2.75, 16, 5500), new DistanceShootUtil(comp, 3.5, 19, 5750),
+      new DistanceShootUtil(comp, 4.0, 21, 5850), new DistanceShootUtil(comp, 4.9, 28, 5900) };
 
   DistanceShootUtil distanceUtil = null;
-
 
   public DistanceShoot(IO io) {
     this.io = io;
@@ -42,11 +44,12 @@ public class DistanceShoot extends Command {
     addRequirements(io.flywheel, io.feeder);
     this.distanceUtil = distanceUtil;
   }
+
   public DistanceShoot(IO io, boolean auto) {
     this.io = io;
     addRequirements(io.flywheel, io.feeder);
     this.auto = auto;
-    if(auto){
+    if (auto) {
       io.chassis.currentState = swerveState.SCORING;
     }
   }
@@ -55,37 +58,38 @@ public class DistanceShoot extends Command {
   public void initialize() {
     blue = DriverStation.getAlliance().get() == Alliance.Blue;
     timer.restart();
-    
   }
 
   @Override
   public void execute() {
-    DistanceShootUtil helper;
+    if ((auto && timer.get() >= 1) || !auto) {
+      DistanceShootUtil helper;
 
-    if (io.chassis.currentState != swerveState.PASSING) {
-      if (distanceUtil == null) {
-        Translation2d hub = blue ? RobotContainer.BLUE_HUB : RobotContainer.RED_HUB;
-        Translation2d diff = hub.minus(io.chassis.getEstimatedPose().getTranslation());
-        helper = calculateFlywheel(Math.hypot(diff.getY(), diff.getX()));
+      if (io.chassis.currentState != swerveState.PASSING) {
+        if (distanceUtil == null) {
+          Translation2d hub = blue ? RobotContainer.BLUE_HUB : RobotContainer.RED_HUB;
+          Translation2d diff = hub.minus(io.chassis.getEstimatedPose().getTranslation());
+          helper = calculateFlywheel(Math.hypot(diff.getY(), diff.getX()));
+        } else {
+          helper = distanceUtil;
+        }
       } else {
-        helper = distanceUtil;
+        helper = new DistanceShootUtil(14, 5800);
       }
-    } else {
-      // TODO Find optimal values for passing from mid field
-      helper = new DistanceShootUtil(14, 5800);
-    }
 
-    io.flywheel.hoodAngle(helper.hoodAngle);
-    io.flywheel.RPM(helper.shooterRPM);
-    SmartDashboard.putNumber("Target Shooter RPM", helper.shooterRPM);
+      io.flywheel.hoodAngle(helper.hoodAngle);
+      io.flywheel.RPM(helper.shooterRPM);
+      SmartDashboard.putNumber("Target Shooter RPM", helper.shooterRPM);
 
-    if (Math.abs(io.flywheel.RPM() - helper.shooterRPM) < RPM_TOLERANCE
-        && Math.abs(io.flywheel.hoodAngle() - helper.hoodAngle) < ANGLE_TOLERANCE || io.chassis.currentState == swerveState.PASSING) {
-      io.feeder.voltLoop(feederVolts);
-      io.feeder.unblock();
-      
-      new WaitCommand(0.20);
-      io.feeder.agitatorSpeed(0.8);
+      if (Math.abs(io.flywheel.RPM() - helper.shooterRPM) < RPM_TOLERANCE
+          && Math.abs(io.flywheel.hoodAngle() - helper.hoodAngle) < ANGLE_TOLERANCE
+          || io.chassis.currentState == swerveState.PASSING) {
+        io.feeder.voltLoop(feederVolts);
+        io.feeder.unblock();
+
+        new WaitCommand(0.20);
+        io.feeder.agitatorSpeed(0.8);
+      }
     }
   }
 
@@ -94,23 +98,23 @@ public class DistanceShoot extends Command {
     DistanceShootUtil upper = data[data.length - 1];
 
     for (int i = 0; i < data.length - 1; i++) {
-      if (distance >= data[i].distance && distance <= data[i + 1].distance) {
+      if (distance >= data[i].distance && distance <=  data[i + 1].distance) {
         lower = data[i];
         upper = data[i + 1];
         break;
       }
     }
-
+// 
     double factor = (distance - lower.distance) / (upper.distance - lower.distance);
     factor = MathUtil.clamp(factor, 0, 1);
 
     double hood = lower.hoodAngle + factor * (upper.hoodAngle - lower.hoodAngle);
     double rpm = lower.shooterRPM + factor * (upper.shooterRPM - lower.shooterRPM);
 
-    if(comp)
+    if (comp)
       return new DistanceShootUtil(distance, hood, rpm);
     else
-      return new DistanceShootUtil(distance, hood, rpm - 250);
+      return new DistanceShootUtil(distance, hood, rpm - 270);
   }
 
   @Override
@@ -125,6 +129,6 @@ public class DistanceShoot extends Command {
 
   @Override
   public boolean isFinished() {
-    return auto ? (timer.get() >= 4.5) : false;
+    return auto ? (timer.get() >= 3.0) : false;
   }
 }

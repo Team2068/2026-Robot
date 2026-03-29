@@ -21,8 +21,8 @@ public class AgitateChassis extends Command {
 
   @Override
   public void execute() {
-    io.chassis.drive(new ChassisSpeeds(0.0, 0.0, 1));
-    if(timer.get() >= 1)
+    io.chassis.drive(new ChassisSpeeds(0.0, 0.0, 3));
+    if(timer.get() >= 0.6)
       end = true;
   }
 
